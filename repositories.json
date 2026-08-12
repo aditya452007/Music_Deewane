@@ -1,10 +1,10 @@
 {
     "repositories": [
         {
-        "id": 1,
-        "name": "bloom-factory",
-        "url": "https://github.com/kojima-ui/bloom-factory/releases/latest/download/bex-factory.json",
-        "install": true
-    }
-]
+            "id": 1,
+            "name": "Music Deewane Factory",
+            "url": "https://aditya452007.github.io/Music_Deewane_factory/bex-factory.json",
+            "install": true
+        }
+    ]
 }
