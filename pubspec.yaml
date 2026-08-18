@@ -49,6 +49,7 @@ dependencies:
   string_similarity: ^2.0.0
   package_info_plus: ^10.2.1
   url_launcher: ^6.3.2
+  open_filex: ^4.7.0
   badges: ^3.1.2
   flutter_displaymode: ^0.7.0
   country_codes: ^3.3.0

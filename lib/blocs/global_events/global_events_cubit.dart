@@ -27,7 +27,8 @@ class GlobalEventsCubit extends Cubit<GlobalEventsState> {
         emit(UpdateAvailable(
           newVersion: updates["newVer"],
           newBuild: updates["newBuild"],
-          downloadUrl: "https://music-deewane.sourceforge.io/",
+          downloadUrl: updates["download_url"] ??
+              "https://music-deewane.sourceforge.io/",
         ));
       }
     }

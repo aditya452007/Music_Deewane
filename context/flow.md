@@ -125,7 +125,7 @@ graph TD
 
 ### Flow: Settings, Updates, Shortcuts
 - `SettingsCubit`: 29 keys loaded in parallel, single emit; every setter persists (SettingsDAO string/bool K/V) + emits; EQ (10-band, presets, builtin/device source), crossfade, qualities, backup gate (≤1/day), music languages, favorite artists.
-- Updates: `GlobalEventsCubit.checkForUpdates` → `bloomee_updater_tools.getAppUpdates()` (GitHub releases API, SourceForge `best_release.json` fallback) → Update dialog; `NotificationCubit` writes in-app notifications. (Changelog "What's New" screen removed — ADR-037.)
+- Updates: `GlobalEventsCubit.checkForUpdates` → `getAppUpdates()` (GitHub releases API, SourceForge `best_release.json` fallback) → Update dialog → **in-app download** (streaming progress) → platform install (OpenFilex on Android, Process.run on desktop). `NotificationCubit` writes in-app notifications. (Changelog "What's New" screen removed — ADR-037.)
 - Desktop keyboard shortcuts (`KeyboardShortcutsHandler`): media keys, Space, ←/→, ↑/↓, R, S, M, L, T, Alt+←/→ seek (10s, ADR-023), Esc/Backspace (Up Next → player → back).
 
 ---

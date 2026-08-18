@@ -1,4 +1,5 @@
 import 'package:music_deewane/services/music_deewane_updater_tools.dart';
+import 'package:music_deewane/services/update_service.dart';
 import 'package:flutter/material.dart';
 import 'package:music_deewane/core/theme/app_theme.dart';
 import 'package:music_deewane/utils/url_launcher.dart';
@@ -7,6 +8,89 @@ import 'package:iconsx_plus/iconsx_plus.dart';
 
 class CheckUpdateView extends StatelessWidget {
   const CheckUpdateView({super.key});
+
+  void _downloadUpdate(BuildContext context, String url) {
+    final service = UpdateService();
+    final fileName = service.getFileName(url);
+    double progress = 0;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) {
+          return AlertDialog(
+            backgroundColor: const Color(0xFF12101A),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(
+                  height: 40,
+                  width: 40,
+                  child: CircularProgressIndicator(strokeWidth: 3),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Downloading update...',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.9),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                LinearProgressIndicator(
+                  value: progress > 0 ? progress : null,
+                  backgroundColor: Colors.white.withValues(alpha: 0.1),
+                ),
+                if (progress > 0) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    '${(progress * 100).toStringAsFixed(0)}%',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.5),
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          );
+        },
+      ),
+    );
+
+    service.download(url, fileName).listen(
+      (p) {
+        progress = p;
+      },
+      onDone: () async {
+        if (context.mounted && Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+        try {
+          final tempDir = await service.getTempDir();
+          await service.install('$tempDir/$fileName');
+        } catch (e) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Install failed: $e')),
+            );
+          }
+        }
+      },
+      onError: (e) {
+        if (context.mounted && Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Download failed. Try again.')),
+          );
+        }
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +131,6 @@ class CheckUpdateView extends StatelessWidget {
                               "https://github.com/aditya452007/Music_Deewane/releases"));
                         },
                         child: SizedBox(
-                          // width: 150,
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -114,8 +197,8 @@ class CheckUpdateView extends StatelessWidget {
                       padding: const EdgeInsets.all(8.0),
                       child: FilledButton(
                         onPressed: () {
-                          launchUrl2(
-                              Uri.parse("https://music-deewane.sourceforge.io/"));
+                          _downloadUpdate(
+                              context, snapshot.data?["download_url"] ?? '');
                         },
                         child: SizedBox(
                           width: 150,

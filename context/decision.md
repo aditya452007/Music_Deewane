@@ -34,6 +34,7 @@
 ## Decision Index
 
 | ID | Date | Decision | Status | Affects |
+| ADR-042 | 2026-08-18 | In-app update: download from GitHub releases with progress + platform install | Accepted | update_service.dart (new), global_events_cubit.dart, global_event_listener.dart, check_update_view.dart, pubspec.yaml |
 | ADR-041 | 2026-08-18 | Windows MSIX + Inno Setup installer: add both packaging formats to CI/CD pipeline | Accepted | pubspec.yaml, installer/windows/music_deewane.iss (new), release-windows.yml |
 | ADR-040 | 2026-08-18 | Reset git history: orphan single-commit main + ghpage, single-author repo, delete v1.0.1* tags | Accepted | git history, branches, tags |
 | ADR-039 | 2026-08-18 | Fix selected search chip: black text on white bg; bump unselected chip contrast further (corrects ADR-038) | Accepted | search_screen.dart |
@@ -102,6 +103,16 @@
 ## Decision Entries
 
 <!-- Newest decisions go at the top of this section. -->
+
+### ADR-042: In-app update — download from GitHub releases with progress + platform install
+- **Date**: 2026-08-18
+- **Status**: Accepted
+- **Context**: Update dialog and settings screen both redirected to SourceForge in the browser for manual download. The app already fetched GitHub releases API and extracted platform-matching `browser_download_url`, but hardcoded SourceForge URL instead of using it. User wanted seamless in-app updates — click "Update Now", download progresses, auto-install.
+- **Options considered**: Fix URL to open GitHub asset in browser (rejected — still requires manual install); full in-app download with progress + platform install (chosen).
+- **Decision**: (1) Created `lib/services/update_service.dart` (~70 lines): HTTP streaming download via `Client.send()` + `StreamedResponse` with progress `Stream<double>`, platform-specific install (OpenFilex for Android APK, `Process.run` for Windows/Linux). (2) Fixed `GlobalEventsCubit` to pass `updates["download_url"]` instead of hardcoded SourceForge URL. (3) Updated `GlobalEventListener` update dialog: "Update Now" opens progress dialog → download → auto-install on complete. (4) Updated `CheckUpdateView` settings screen with same flow. (5) Added `open_filex: ^4.7.0` dependency.
+- **Why**: Best UX — user clicks once, app downloads and installs. Progress visible in dialog. Download continues if user backgrounds the app. No browser redirect, no manual install.
+- **Consequences**: Android requires "Install unknown apps" permission (one-time user prompt via OpenFilex). Windows/Linux use Process.run to open the downloaded file. No SHA256 verification (GitHub releases don't provide consistent checksums). No download resume (file is small enough to retry).
+- **Affects**: `lib/services/update_service.dart` (new), `lib/blocs/global_events/global_events_cubit.dart`, `lib/screens/widgets/global_event_listener.dart`, `lib/screens/screen/home_views/setting_views/check_update_view.dart`, `pubspec.yaml`
 
 ### ADR-041: Windows MSIX + Inno Setup installer
 - **Date**: 2026-08-18

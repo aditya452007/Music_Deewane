@@ -6,6 +6,7 @@ import 'package:music_deewane/l10n/app_localizations.dart';
 import 'package:music_deewane/screens/widgets/music_deewane_ui_kit/music_deewane_dialog.dart';
 import 'package:music_deewane/screens/widgets/snackbar.dart';
 import 'package:music_deewane/services/plugin/plugin_event_bus.dart';
+import 'package:music_deewane/services/update_service.dart';
 import 'package:music_deewane/src/rust/api/plugin/events.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -108,6 +109,100 @@ class _GlobalEventListenerState extends State<GlobalEventListener> {
     }
   }
 
+  void _showUpdateDialog(
+      BuildContext context, UpdateAvailable state, AppLocalizations l10n) {
+    final updateService = UpdateService();
+    final fileName = updateService.getFileName(state.downloadUrl);
+
+    showMusicDeewaneDialog(
+      context: context,
+      title: l10n.dialogUpdateAvailable,
+      subtitle: l10n.updateAvailableBody(state.newVersion, state.newBuild),
+      icon: Icons.system_update_rounded,
+      actions: [
+        MusicDeewaneDialogAction.text(l10n.buttonLater),
+        MusicDeewaneDialogAction.filled(l10n.dialogUpdateNow, onPressed: () {
+          Navigator.of(context).pop();
+          _downloadUpdate(context, updateService, state.downloadUrl, fileName);
+        }),
+      ],
+    );
+  }
+
+  void _downloadUpdate(BuildContext context, UpdateService service, String url,
+      String fileName) {
+    double progress = 0;
+    final ctx = context;
+    showDialog(
+      context: ctx,
+      barrierDismissible: false,
+      builder: (dialogCtx) => StatefulBuilder(
+        builder: (dialogCtx, setDialogState) {
+          return AlertDialog(
+            backgroundColor: const Color(0xFF12101A),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(
+                  height: 40,
+                  width: 40,
+                  child: CircularProgressIndicator(strokeWidth: 3),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Downloading update...',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.9),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                LinearProgressIndicator(
+                  value: progress > 0 ? progress : null,
+                  backgroundColor: Colors.white.withValues(alpha: 0.1),
+                ),
+                if (progress > 0) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    '${(progress * 100).toStringAsFixed(0)}%',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.5),
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          );
+        },
+      ),
+    );
+
+    service.download(url, fileName).listen(
+      (p) {
+        progress = p;
+      },
+      onDone: () async {
+        if (ctx.mounted && Navigator.of(ctx).canPop()) Navigator.of(ctx).pop();
+        try {
+          final tempDir = await service.getTempDir();
+          await service.install('$tempDir/$fileName');
+        } catch (e) {
+          if (ctx.mounted) {
+            SnackbarService.showMessage('Install failed: $e');
+          }
+        }
+      },
+      onError: (e) {
+        if (ctx.mounted && Navigator.of(ctx).canPop()) Navigator.of(ctx).pop();
+        if (ctx.mounted) {
+          SnackbarService.showMessage('Download failed. Try again.');
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<GlobalEventsCubit, GlobalEventsState>(
@@ -116,20 +211,7 @@ class _GlobalEventListenerState extends State<GlobalEventListener> {
         if (state is UpdateAvailable) {
           final l10n = AppLocalizations.of(dialogContext)!;
           log("Update Available: ${state.newVersion}+${state.newBuild}");
-          showMusicDeewaneDialog(
-            context: dialogContext,
-            title: l10n.dialogUpdateAvailable,
-            subtitle:
-                l10n.updateAvailableBody(state.newVersion, state.newBuild),
-            icon: Icons.system_update_rounded,
-            actions: [
-              MusicDeewaneDialogAction.text(l10n.buttonLater),
-              MusicDeewaneDialogAction.filled(l10n.dialogUpdateNow,
-                  onPressed: () {
-                openURL(state.downloadUrl);
-              }),
-            ],
-          );
+          _showUpdateDialog(dialogContext, state, l10n);
         } else if (state is AlertDialogState) {
           final l10n = AppLocalizations.of(dialogContext)!;
           showMusicDeewaneDialog(
