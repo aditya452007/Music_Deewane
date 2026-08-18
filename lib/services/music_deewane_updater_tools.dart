@@ -20,14 +20,27 @@ bool isUpdateAvailable(
   List<int> currentParts = parseVersion(currentVer);
   List<int> newParts = parseVersion(newVer);
 
+  log('isUpdateAvailable: currentVer="$currentVer" currentBuild="$currentBuild" newVer="$newVer" newBuild="$newBuild" checkBuild=$checkBuild',
+      name: 'UpdaterTools');
+  log('isUpdateAvailable: currentParts=$currentParts newParts=$newParts',
+      name: 'UpdaterTools');
+
   final maxLen = currentParts.length > newParts.length
       ? currentParts.length
       : newParts.length;
   for (int i = 0; i < maxLen; i++) {
     final cur = i < currentParts.length ? currentParts[i] : 0;
     final neu = i < newParts.length ? newParts[i] : 0;
-    if (neu > cur) return true;
-    if (neu < cur) return false;
+    if (neu > cur) {
+      log('isUpdateAvailable: version[${neu > cur}] $neu > $cur → true',
+          name: 'UpdaterTools');
+      return true;
+    }
+    if (neu < cur) {
+      log('isUpdateAvailable: version[${neu < cur}] $neu < $cur → false',
+          name: 'UpdaterTools');
+      return false;
+    }
   }
 
   if (checkBuild && !Platform.isLinux) {
@@ -43,10 +56,21 @@ bool isUpdateAvailable(
 
     final curBuild = parseBuild(currentBuild);
     final newBuildNum = parseBuild(newBuild);
-    if (newBuildNum > curBuild) return true;
-    if (newBuildNum < curBuild) return false;
+    log('isUpdateAvailable: curBuild=$curBuild newBuildNum=$newBuildNum',
+        name: 'UpdaterTools');
+    if (newBuildNum > curBuild) {
+      log('isUpdateAvailable: build $newBuildNum > $curBuild → true',
+          name: 'UpdaterTools');
+      return true;
+    }
+    if (newBuildNum < curBuild) {
+      log('isUpdateAvailable: build $newBuildNum < $curBuild → false',
+          name: 'UpdaterTools');
+      return false;
+    }
   }
 
+  log('isUpdateAvailable: no update found → false', name: 'UpdaterTools');
   return false;
 }
 
@@ -179,6 +203,11 @@ Future<Map<String, dynamic>> githubUpdate(
       final versionPart =
           tagParts.isNotEmpty ? tagParts[0].replaceFirst('v', '') : '';
       final buildPart = tagParts.length > 1 ? tagParts[1] : '';
+
+      log('GitHub raw tag="$tag" versionPart="$versionPart" buildPart="$buildPart"',
+          name: 'UpdaterTools');
+      log('GitHub local: version="${packageInfo.version}" build="${packageInfo.buildNumber}"',
+          name: 'UpdaterTools');
 
       // Attempt to extract download url from assets if possible
       String? download = extractUpUrl(data);

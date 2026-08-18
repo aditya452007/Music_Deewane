@@ -20,6 +20,11 @@ class GlobalEventsCubit extends Cubit<GlobalEventsState> {
   void checkForUpdates() async {
     final Map<String, dynamic> updates = await getAppUpdates();
     log("Checking for updates...", name: 'GlobalEventsCubit');
+    log("Current: ${updates["currVer"]}+${updates["currBuild"]}",
+        name: 'GlobalEventsCubit');
+    log("Remote: ${updates["newVer"]}+${updates["newBuild"]} (source: ${updates["source"]})",
+        name: 'GlobalEventsCubit');
+    log("isUpdateAvailable: ${updates["results"]}", name: 'GlobalEventsCubit');
 
     if (await _settingsDao.getSettingBool(SettingKeys.autoUpdateNotify) ??
         true) {

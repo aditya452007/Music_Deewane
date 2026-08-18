@@ -17,8 +17,14 @@ class NotificationCubit extends Cubit<NotificationState> {
       : _notificationDao = notificationDao,
         super(NotificationInitial()) {
     getLatestVersion().then((value) {
+      log("NotificationCubit: results=${value["results"]} currBuild=${value["currBuild"]} newBuild=${value["newBuild"]}",
+          name: 'NotificationCubit');
       if (value["results"]) {
-        if (int.parse(value["currBuild"]) < int.parse(value["newBuild"])) {
+        final curr = int.tryParse(value["currBuild"].toString()) ?? 0;
+        final newB = int.tryParse(value["newBuild"].toString()) ?? 0;
+        log("NotificationCubit: curr=$curr new=$newB shouldNotify=${curr < newB}",
+            name: 'NotificationCubit');
+        if (curr < newB) {
           _notificationDao.putNotification(
             title: "Update Available",
             body:
