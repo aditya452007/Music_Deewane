@@ -119,7 +119,7 @@ flutter_launcher_icons:
     generate: true
     image_path: "assets/icons/logo.png"
 
-msix:
+msix_config:
   display_name: Music Deewane
   publisher_display_name: Music Deewane
   identity_name: com.musicdeewane.app
@@ -127,10 +127,9 @@ msix:
   logo_path: assets/icons/logo.png
   capabilities: internetClient, musicLibrary
   languages: en-us, hi-in
-  file_extension: .msix
-  install_certificate_location: localMachine
-  update_blocks_app_install: true
-  store: false
+  install_certificate: false
+  sign_msix: false
+  publisher: CN=Music Deewane
 
 # The following section is specific to Flutter packages.
 flutter:

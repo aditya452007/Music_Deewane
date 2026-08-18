@@ -50,7 +50,7 @@ jobs:
         run: flutter build windows --release --build-number ${{ github.run_number }}
 
       - name: Create MSIX
-        run: flutter pub run msix:create --version ${{ steps.version.outputs.VERSION }}.0 --no-certificate
+        run: dart run msix:create --version ${{ steps.version.outputs.VERSION }}.0
 
       - name: Install Inno Setup
         run: winget install JRSoftware.InnoSetup --accept-package-agreements --accept-source-agreements
