@@ -59,23 +59,12 @@ jobs:
         shell: pwsh
         run: Start-Process -FilePath 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' -ArgumentList 'installer\windows\music_deewane.iss' -Wait -NoNewWindow
 
-      - name: Package Windows Artifacts
+      - name: Package Windows ZIP
         shell: pwsh
         run: |
           $v = "${{ steps.version.outputs.V_TAG }}"
           $releaseDir = "build/windows/x64/runner/Release"
-          $staging = "windows_artifacts"
-          New-Item -ItemType Directory -Path $staging -Force
-          # Move MSIX out of Release before zipping
-          if (Test-Path "$releaseDir/app.msix") {
-            Move-Item "$releaseDir/app.msix" "$staging/app.msix"
-          }
-          # Move EXE installer into staging
-          if (Test-Path "installer_output/MusicDeewaneSetup_*.exe") {
-            Get-Item "installer_output/MusicDeewaneSetup_*.exe" | Move-Item -Destination "$staging/"
-          }
-          # Zip only the Release folder (no MSIX inside)
-          Compress-Archive -Path "$releaseDir/*" -DestinationPath "$staging/music_deewane_windows_v${v}.zip"
+          Compress-Archive -Path "$releaseDir/*" -DestinationPath "windows_artifacts/music_deewane_windows_v${v}.zip"
 
       - name: Upload Windows Artifacts
         uses: actions/upload-artifact@v6
@@ -101,11 +90,11 @@ jobs:
             | Platform | File |
             |----------|------|
             | Windows (x64) Portable | music_deewane_windows_v${{ steps.version.outputs.V_TAG }}.zip |
-            | Windows (x64) MSIX | app.msix |
+            | Windows (x64) MSIX | music_deewane.msix |
             | Windows (x64) Installer | MusicDeewaneSetup_${{ steps.version.outputs.VERSION }}.exe |
           artifacts: |
             windows_artifacts/music_deewane_windows_*.zip
-            windows_artifacts/app.msix
+            windows_artifacts/music_deewane.msix
             windows_artifacts/MusicDeewaneSetup_*.exe
           token: ${{ github.token }}
           allowUpdates: true

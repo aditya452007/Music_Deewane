@@ -131,6 +131,8 @@ msix_config:
   install_certificate: false
   sign_msix: false
   publisher: CN=Music Deewane
+  output_path: windows_artifacts
+  output_name: music_deewane
 
 # The following section is specific to Flutter packages.
 flutter:
