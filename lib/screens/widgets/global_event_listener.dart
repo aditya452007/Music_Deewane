@@ -111,9 +111,6 @@ class _GlobalEventListenerState extends State<GlobalEventListener> {
 
   void _showUpdateDialog(
       BuildContext context, UpdateAvailable state, AppLocalizations l10n) {
-    final updateService = UpdateService();
-    final fileName = updateService.getFileName(state.downloadUrl);
-
     showMusicDeewaneDialog(
       context: context,
       title: l10n.dialogUpdateAvailable,
@@ -123,83 +120,13 @@ class _GlobalEventListenerState extends State<GlobalEventListener> {
         MusicDeewaneDialogAction.text(l10n.buttonLater),
         MusicDeewaneDialogAction.filled(l10n.dialogUpdateNow, onPressed: () {
           Navigator.of(context).pop();
-          _downloadUpdate(context, updateService, state.downloadUrl, fileName);
+          UpdateService().showDownloadDialog(
+            context,
+            url: state.downloadUrl,
+            version: '${state.newVersion}+${state.newBuild}',
+          );
         }),
       ],
-    );
-  }
-
-  void _downloadUpdate(BuildContext context, UpdateService service, String url,
-      String fileName) {
-    double progress = 0;
-    final ctx = context;
-    showDialog(
-      context: ctx,
-      barrierDismissible: false,
-      builder: (dialogCtx) => StatefulBuilder(
-        builder: (dialogCtx, setDialogState) {
-          return AlertDialog(
-            backgroundColor: const Color(0xFF12101A),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(
-                  height: 40,
-                  width: 40,
-                  child: CircularProgressIndicator(strokeWidth: 3),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  'Downloading update...',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.9),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                LinearProgressIndicator(
-                  value: progress > 0 ? progress : null,
-                  backgroundColor: Colors.white.withValues(alpha: 0.1),
-                ),
-                if (progress > 0) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    '${(progress * 100).toStringAsFixed(0)}%',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.5),
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          );
-        },
-      ),
-    );
-
-    service.download(url, fileName).listen(
-      (p) {
-        progress = p;
-      },
-      onDone: () async {
-        if (ctx.mounted && Navigator.of(ctx).canPop()) Navigator.of(ctx).pop();
-        try {
-          final tempDir = await service.getTempDir();
-          await service.install('$tempDir/$fileName');
-        } catch (e) {
-          if (ctx.mounted) {
-            SnackbarService.showMessage('Install failed: $e');
-          }
-        }
-      },
-      onError: (e) {
-        if (ctx.mounted && Navigator.of(ctx).canPop()) Navigator.of(ctx).pop();
-        if (ctx.mounted) {
-          SnackbarService.showMessage('Download failed. Try again.');
-        }
-      },
     );
   }
 
