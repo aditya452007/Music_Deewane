@@ -1,0 +1,87 @@
+name: Build & Release Windows
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**/*.md"
+      - "LICENSE"
+      - "fastlane/**"
+      - ".github/FUNDING.yml"
+      - "ghpage/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Windows Build & Release
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.44.9"
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Extract version
+        id: version
+        shell: pwsh
+        run: |
+          $line = Select-String -Path pubspec.yaml -Pattern '^version:\s*(\S+)' | Select-Object -First 1
+          if (-not $line) { throw "version not found in pubspec.yaml" }
+          $ver = $line.Matches[0].Groups[1].Value.Split('+')[0]
+          $vtag = "$ver+${{ github.run_number }}"
+          "VERSION=$ver" >> $env:GITHUB_OUTPUT
+          "V_TAG=$vtag" >> $env:GITHUB_OUTPUT
+
+      - name: Build Windows
+        run: flutter build windows --release --build-number ${{ github.run_number }}
+
+      - name: Package Windows Artifacts
+        shell: pwsh
+        run: |
+          $v = "${{ steps.version.outputs.V_TAG }}"
+          $releaseDir = "build/windows/x64/runner/Release"
+          Compress-Archive -Path "$releaseDir/*" -DestinationPath "music_deewane_windows_v${v}.zip"
+
+      - name: Upload Windows Artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: release-assets-windows
+          path: music_deewane_windows_*.zip
+
+      - name: Create/Update GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ steps.version.outputs.V_TAG }}
+          name: Music Deewane v${{ steps.version.outputs.V_TAG }}
+          commit: ${{ github.sha }}
+          body: |
+            ## Music Deewane v${{ steps.version.outputs.VERSION }} (Windows)
+
+            - **Version:** ${{ steps.version.outputs.VERSION }}
+            - **Tag:** v${{ steps.version.outputs.V_TAG }}
+            - **Build:** #${{ github.run_number }}
+            - **Commit:** ${{ github.sha }}
+
+            ### Windows Downloads
+            | Platform | File |
+            |----------|------|
+            | Windows (x64) | music_deewane_windows_v${{ steps.version.outputs.V_TAG }}.zip |
+          artifacts: music_deewane_windows_*.zip
+          token: ${{ github.token }}
+          allowUpdates: true
+          replacesArtifacts: false
+          makeLatest: legacy

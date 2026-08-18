@@ -1,0 +1,469 @@
+# Decision Log
+
+> **Purpose**: The "why" file. An **append-only** log of every meaningful decision —
+> which library was chosen and why, architecture choices, feature decisions, branch
+> decisions, tradeoffs. When anyone (human or AI) wonders "why is it built this way?",
+> the answer is here.
+>
+> **Update rule (MANDATORY)**: Append a new entry for EVERY meaningful decision.
+> **Never edit or delete past entries** — that would rewrite history and break the
+> log's purpose. Before making a new decision, check this log first (don't decide
+> twice).
+
+---
+
+## What counts as a "meaningful decision"? (MANDATORY — log all of these)
+
+- **Library / framework / tool choice** — component library, icon set, state manager, animation lib, styling approach
+- **Architecture / pattern choice** — folder structure, data flow, error strategy, server vs client components
+- **Feature design decisions** — scope, UX, API shape, data model
+- **Branch / workflow decisions** — git flow, release process, deployment target
+- **Anything you had to think about for more than ~5 seconds**
+
+---
+
+## How to add a decision
+
+1. Copy the **Template** below into the **Decision Entries** section (newest on top)
+2. Fill it in — the **Why** line is the most important part
+3. Add a row to the **Decision Index** table
+4. If it supersedes an earlier decision, mark the old one as `Superseded by ADR-NNN`
+
+---
+
+## Decision Index
+
+| ID | Date | Decision | Status | Affects |
+| ADR-040 | 2026-08-18 | Reset git history: orphan single-commit main + ghpage, single-author repo, delete v1.0.1* tags | Accepted | git history, branches, tags |
+| ADR-039 | 2026-08-18 | Fix selected search chip: black text on white bg; bump unselected chip contrast further (corrects ADR-038) | Accepted | search_screen.dart |
+| ADR-038 | 2026-08-18 | Search chip contrast boost, semi-transparent text-selection highlight, Top Picks grid height computed from screen width | Accepted | search_screen.dart, app_theme.dart, top_picks_widget.dart |
+| ADR-037 | 2026-08-18 | Remove onboarding music-language & artist steps, changelog "What's New" screen, and About/developer page; keep only Language+Country onboarding | Accepted | onboarding_overlay.dart, default_artists.dart (deleted), changelog_reader.dart (deleted), about.dart (deleted), global_events_cubit/state, global_event_listener.dart, music_deewane_updater_tools.dart, setting_keys.dart, explore_screen.dart, setting_view.dart |
+| ADR-034 | 2026-08-14 | Sidebar nav items expanded, mini player bleed fixed, player expand mode | Accepted | global_footer.dart, player_overlay_wrapper.dart, player_screen.dart |
+| ADR-035 | 2026-08-14 | Player button layout redesign — scrollable pills, artwork seek zones, action icon row | Accepted | player_screen.dart |
+| ADR-033 | 2026-08-14 | UX refinements: single top-artist ForYou section, language/country-based default artists in onboarding, player overlay respects sidebar on desktop, sidebar library header tappable | Accepted | recommendation_cubit.dart, recommendation_state.dart, for_you_section.dart, default_artists.dart (new), onboarding_overlay.dart, player_overlay_wrapper.dart, global_footer.dart |
+| ADR-032 | 2026-08-14 | UX fixes & sidebar redesign: onboarding reorder + skip, Spotify-style collapsible sidebar, For You topic grids, TopPicks fixes, recommendation bug fix, search in discover bar | Accepted | onboarding_overlay.dart, global_footer.dart, for_you_section.dart, top_picks_widget.dart, recommendation_cubit.dart, explore_screen.dart, app_en.arb |
+| ADR-031 | 2026-08-14 | Frontend marketing site rebuild: Spotify-inspired alternating feature rows, split hero with mockup, social proof strip, multi-tier footer with categorized columns, warm teal theme | Accepted | frontend/index.html, frontend/css/style.css, frontend/js/main.js |
+| ADR-030 | 2026-08-14 | Smart recommendations & onboarding wizard: multi-step onboarding (language/country → artist selection → music language), weighted history + artist affinity algorithm, "For You" section, manage preferences | Accepted | onboarding_overlay.dart, recommendation_cubit.dart, for_you_section.dart, manage_preferences_screen.dart, setting_keys.dart, settings_state.dart, settings_cubit.dart, explore_screen.dart, main.dart, app_en.arb |
+| ADR-029 | 2026-08-13 | Lyrics container removed, carousel removed, recently played removed, search source switching | Accepted | player_screen.dart, explore_screen.dart, search_screen.dart |
+| ADR-028 | 2026-08-13 | UX error handling & empty states — cross-source search fallback, offline banner, guided empty states, playback error recovery, lyrics timeout, import guidance, plugin health | Accepted | search_screen.dart, player_error_handler.dart, player_screen.dart, offline_banner.dart (new), global_footer.dart, library_screen.dart, offline_screen.dart, playlist_screen.dart, add_to_playlist_screen.dart, fullscreen_lyrics_view.dart, lyrics_search.dart, import_process_screen.dart, plugin_manager_screen.dart, global_event_listener.dart, app_en.arb + 6 locale files |
+| ADR-027 | 2026-08-13 | UI polish: TopPicks grid layout, lyrics glass morphism, hover wrapper, carousel removal, recently played section, logo integration, button spacing | Accepted | top_picks_widget.dart, player_screen.dart, up_next_panel.dart, explore_screen.dart, carousel_card_widget.dart (deleted), load_image.dart, pallete_generator.dart, pubspec.yaml |
+| ADR-026 | 2026-08-13 | Home section redesign: QuickAccessChips (playlist pills), TopPicksWidget horizontal scroll, chart carousel moved lower | Accepted | explore_screen.dart, top_picks_widget.dart |
+| ADR-025 | 2026-08-13 | Player UX: Spotify/YouTube Music standard layout (mobile: shuffle|prev|play|next|repeat + lyrics; desktop: adds ±10s + volume), volume slider fix, lyrics auto-scroll, loop popup fix | Accepted | player_screen.dart, organic_player_control.dart |
+| ADR-024 | 2026-08-13 | Fix Flutter 3.44/Dart 3.12 build errors: file_picker 12.x API, ffi 2.x, Isar schema regen, 51 analyzer warnings, Android SDK/Gradle/Kotlin upgrades, permission_handler downgrade | Accepted | pubspec.yaml, android/app/build.gradle.kts, android/settings.gradle.kts, android/gradle/wrapper/gradle-wrapper.properties, android/app/src/main/kotlin/, android/app/src/main/res/xml/share_targets.xml, linux/CMakeLists.txt, .github/workflows/release-android.yml, 51 Dart files across lib/ |
+| ADR-022 | 2026-08-12 | Void Monochrome redesign: player + theme (black/white, organic controls, wave progress, no glow) | Accepted | app_theme.dart, player_screen.dart, play_pause_widget.dart, organic_player_control.dart, wave_progress_bar.dart, mini_player_widget.dart, like_widget.dart |
+| ADR-023 | 2026-08-12 | Player controls polish: white organic buttons, ±10s seek, tablet+desktop volume slider, secondary buttons moved to more sheet | Accepted | player_screen.dart, organic_player_control.dart, more_bottom_sheet.dart, app_en.arb, keyboard_shortcuts_service.dart |
+| ADR-021 | 2026-08-12 | Add hover effects (subtle tint + hand cursor) on all clickable elements for desktop UI | Accepted | lib/screens/widgets/*.dart |
+| ADR-020 | 2026-08-12 | Fix plugin bootstrap: replaced dead UTF-16LE repositories.json with Music_Deewane_factory fork (12 plugins), deleted unused gh-pages branch | Accepted | ghpage branch repositories.json, flow.md, progress-tracker.md |
+| ADR-019 | 2026-08-12 | Fix Windows/Linux binary name: set BINARY_NAME to "Music Deewane" in CMakeLists.txt, update Runner.rc metadata, remove fragile CI rename step | Accepted | windows/CMakeLists.txt, linux/CMakeLists.txt, windows/runner/Runner.rc, release-windows.yml |
+| ADR-018 | 2026-08-11 | Fix Windows build: C2338 MSVC error from deprecated /await compiler option, added _SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS define | Accepted | release-windows.yml |
+| ADR-017 | 2026-08-11 | Fix Android release: build universal APK only, single .apk file, no split-per-abi | Accepted | release-android.yml |
+|----|------|----------|--------|---------|
+| ADR-016 | 2026-08-11 | Swap icons_plus → iconsx_plus (Flutter 3.44 IconData final) | Accepted | pubspec, 60 imports |
+| ADR-015 | 2026-08-11 | Fix Android release: build universal + split APKs, setup-java v5 | Accepted | release-android.yml |
+| ADR-014 | 2026-08-11 | Fix broken CI/CD: Flutter 3.44.9 (VS 2026 generator), drop corrupt libisar.so wget, checkout v5, legacy download media-id strip | Accepted | .github/workflows, legacy_migration_service |
+| ADR-012 | 2026-08-11 | Complete app rename (Bloomee → Music Deewane) across Dart, Rust, platforms, CI | Accepted | entire repo |
+| ADR-011 | 2026-08-11 | Adopt the Template AI framework as the development operating system | Accepted | entire repo |
+| ADR-010 | 2026-08-11 | Defer Skills.py + Spec Kit install until development begins | Accepted | repo root |
+| ADR-009 | 2026-08-11 | Keep all six platforms first-class | Accepted | android/ios/windows/linux/macos/web |
+| ADR-008 | 2026-08-11 | Full UI redesign planned later; Bloomee UI preserved for now | Accepted | all UI |
+| ADR-007 | 2026-08-11 | Keep all current music providers/plugin ecosystem unchanged | Accepted | plugin system |
+| ADR-006 | 2026-08-11 | Defer app rename (Bloomee → Music_Deewane) to branding phase | Superseded by ADR-012 | identity, package, imports |
+| ADR-005 | 2026-08-11 | Diverge from upstream; BloomeeTunes is base only, no scheduled sync | Accepted | git workflow |
+| ADR-004 | 2026-08-11 | Music_Deewane forked from BloomeeTunes; one repo, origin + upstream | Accepted | repo, history |
+| ADR-003 | 2026-08-11 | Remove Scaffold.py — canonical trees are the source of truth | Accepted | template history |
+| ADR-002 | 2026-08-11 | Add flow.md + decision.md as living context files | Accepted | template history |
+
+---
+
+## Template
+
+### ADR-036: Desktop player uses scrollable pills instead of icon row
+- **Date**: 2026-08-15
+- **Status**: Accepted
+- **Context**: Desktop player used `_ActionIconRow` with `OrganicIconButton` (bloom/scalloped icons) that were too close together (4px padding) and visually inconsistent with the mobile pill-style design. Download button called `Navigator.pop(context)` after download, causing the player to close unexpectedly.
+- **Options considered**: Keep separate desktop icon row (rejected — inconsistent UX, too tight); unify desktop and mobile to use same `_ActionPillsRow` with responsive spacing (chosen).
+- **Decision**: Replaced `_ActionIconRow` + `_ActionIconBtn` with `_ActionPillsRow` for both mobile and desktop. Desktop gets `isDesktop: true` flag which increases pill spacing (12px right padding), icon size (20px), text size (14px), and container height (44px). Removed `Navigator.pop(context)` from download pill — download now just enqueues without closing the player. Deleted ~100 lines of unused `_ActionIconRow`/`_ActionIconBtn` code.
+- **Why**: User requested pill-style buttons on desktop matching mobile design, with better spacing for readability. Download button was creating a blank page due to the Navigator.pop.
+- **Consequences**: Single `_ActionPillsRow` widget for all breakpoints; desktop pills are scrollable when space is tight. OrganicIconButton no longer used in action row (still used in transport controls).
+- **Affects**: `lib/screens/screen/player_screen.dart`
+- **Date**: YYYY-MM-DD
+- **Status**: Proposed | Accepted | Rejected | Superseded by ADR-NNN
+- **Context**: [what triggered this decision — the problem being solved]
+- **Options considered**: [alternatives, and why each was rejected]
+- **Decision**: [what was chosen]
+- **Why**: [the reasoning — this is the important part. Write enough that a future agent
+  understands without re-deriving it.]
+- **Consequences**: [positive and negative effects, things to watch out for]
+- **Affects**: [features / files / branches this touches]
+
+---
+
+## Decision Entries
+
+<!-- Newest decisions go at the top of this section. -->
+
+### ADR-040: Reset git history — single-author, single-commit main + ghpage
+- **Date**: 2026-08-18
+- **Status**: Accepted
+- **Context**: The repo carried BloomeeTunes fork history (deliberately kept per ADR-004), so GitHub's contributor list showed many upstream authors. User wants to present as the sole author of the entire application: one commit per branch, one author, two branches (main + ghpage).
+- **Options considered**: Rewrite every commit's author via filter-repo (rejected — keeps 100+ commits, user wants exactly one); orphan branches with a single commit each (chosen); delete the repo and recreate (rejected — loses Issues/Releases/settings).
+- **Decision**: Full mirror backup first (`C:/Users/Hp/Music_Deewane_backup_20260818.git`, verified: both branches + 209 tags + matching main tree hash). Then orphan branch per branch: `git checkout --orphan`, single commit under verified identity (aditya452007 / adityathakur452007@gmail.com), force-push with `--force-with-lease`. ghpage branch name is `ghpage` (not gh-pages, per ADR-020). Release tags v1.0.1* deleted; v1.0.0+x tags kept. This supersedes ADR-004's "keep fork history" decision.
+- **Why**: User decision (2026-08-18). Public presentation: sole contributor. Old history remains recoverable from the mirror backup.
+- **Consequences**: GitHub shows one commit per branch, one contributor. Old tags (v1.0.1*) no longer point into main's history — their release assets remain on GitHub but commit links break. CI re-triggers on force-push. `upstream` remote history no longer shares ancestors with main. Anyone with an old clone must re-clone.
+- **Affects**: git history of `main` and `ghpage`, release tags, GitHub contributor/insights pages
+
+### ADR-039: Fix selected search chip text color (corrects ADR-038)
+- **Date**: 2026-08-18
+- **Status**: Accepted
+- **Context**: ADR-038 raised unselected chip contrast but missed the selected chip: its background is pure white (`accentColor2`) and the selected text color was `primaryColor2` (#E4E4E7, near-white) — white-on-white, so "All"/"Tracks" etc. were invisible when selected. User reported text still not visible.
+- **Options considered**: Outline-style selection instead of white fill (rejected — breaks the established monochrome active-language used by buttons throughout the app); black text on the white fill (chosen).
+- **Decision**: Selected chip text → `accentColor2dark` (#09090B) at w800. Unselected chips pushed further: fill α0.10→0.12, border α0.18→0.28, label fully opaque (`primaryColor1`, no alpha) at w600. Source-chip unselected labels also made fully opaque.
+- **Why**: User decision (2026-08-18). Contrast fix was incomplete; selected state is the most common state to look at and must be readable first.
+- **Consequences**: Both chip rows are readable in both states. ADR-038's chip values are superseded by this entry.
+- **Affects**: `lib/screens/screen/search_screen.dart`
+
+### ADR-038: Search chip contrast, text-selection highlight, Top Picks clipping
+- **Date**: 2026-08-18
+- **Status**: Accepted
+- **Context**: Three visual defects reported by the user. (1) Search-screen chips (category filter chips and plugin source chips) had very low contrast against the void-black theme. (2) Selecting text in the search field to copy it showed a solid-white highlight (`selectionColor: accentColor2` = pure white) that hid the white text underneath. (3) Top Picks grid bottom row was cropped because the PageView container was hard-coded to `rows * 110px` (330px for 3 rows) while the 0.9-aspect grid needs ~405px at typical phone widths.
+- **Options considered**: For the selection highlight — solid gray tint (rejected — off-palette), semi-transparent white (chosen, keeps monochrome palette). For Top Picks — shorter cards or fewer rows (rejected — changes design), compute height from actual layout width via LayoutBuilder (chosen).
+- **Decision**: (1) Unselected category chips: fill `primaryColor1` α0.08→0.10, border α0.05→0.18, label α0.8→0.92. Unselected source chips: border α0.15→0.35, label α0.8→0.92. Selected states unchanged (white on white already max contrast). (2) `textSelectionTheme.selectionColor` changed to `accentColor2.withValues(alpha: 0.3)` in `AppTheme.defaultThemeData` — app-wide, but only fixes the defect. (3) `TopPicksWidget` grid container wrapped in `LayoutBuilder`; height = `rows * (tileWidth / 0.9) + (rows-1) * 8` with tileWidth derived from real constraints minus the 24px horizontal grid padding.
+- **Why**: User decision (2026-08-18), options confirmed via clarifying questions. Contrast fixes make chips legible; 30% white highlight keeps selected words readable; computed height guarantees no row is ever clipped at any screen width.
+- **Consequences**: All three fixes are cosmetic; no behavioral change. Selection highlight change is global (every TextField) — intentional, the solid-white bar was wrong everywhere. Top Picks now reserves its true height, so sections below it shift down slightly on phones (the previously-clipped pixels are now visible content).
+- **Affects**: `lib/screens/screen/search_screen.dart`, `lib/core/theme/app_theme.dart`, `lib/screens/widgets/top_picks_widget.dart`
+
+### ADR-037: Remove onboarding music-language & artist steps, changelog screen, and About/developer page
+- **Date**: 2026-08-18
+- **Status**: Accepted
+- **Context**: User requested trimming the first-run experience and removing two informational screens. The onboarding wizard had grown to 3 steps (Language+Country → Music Language preference → Artist selection). On app open, a "What's New" changelog screen (`ChangelogScreen`) was pushed automatically via `GlobalEventsCubit`. And an About/developer page (with maintainer handle, contact pills, social links) was reachable from the Explore screen flower icon and the Settings "Info" tile.
+- **Options considered**: Keep all three (rejected — user wants a leaner app); remove only some (rejected — user explicitly named all three); remove all three, keeping only the Language+Country onboarding step (chosen).
+- **Decision**: (1) Onboarding reduced to a single Language+Country step; deleted `_StepMusicLangs`, `_StepArtists`, artist/music-lang card widgets, and `default_artists.dart`. Removed the step indicator, prev/next nav, and min-artist gating. (2) Deleted `changelog_reader.dart` (`ChangelogScreen` + parser + widgets), removed `WhatIsNewState` from `GlobalEventsState`, removed its emit in `GlobalEventsCubit.checkForUpdates`, removed the `WhatIsNewState` branch in `GlobalEventListener`, removed `fetchChangelog()` and the changelog-attach block from `getAppUpdates()`, and removed the `readChangelogs` setting key. (3) Deleted `about.dart`, removed the `SiteIcon` flower button from `CustomDiscoverBar` in the Explore screen, and removed the Settings "Info" section with the About tile.
+- **Why**: User decision (2026-08-18). Reduce onboarding friction, drop the auto-showing changelog, and remove the developer-identity page. The `musicLanguages`/`favoriteArtists` settings and the `ManagePreferencesScreen` in Settings are intentionally kept (they still exist and still work for users who want them); only the onboarding *collection* of them was removed.
+- **Consequences**: First-run is now one screen (Language + Country) with a Skip/Continue button. The app no longer fetches or displays a changelog on launch. The About page and its entry points are gone. `flutter analyze` 0 issues.
+- **Affects**: `lib/screens/widgets/onboarding_overlay.dart`, `lib/screens/widgets/default_artists.dart` (deleted), `lib/screens/screen/common_views/changelog_reader.dart` (deleted), `lib/screens/screen/home_views/setting_views/about.dart` (deleted), `lib/blocs/global_events/global_events_cubit.dart`, `lib/blocs/global_events/global_events_state.dart`, `lib/screens/widgets/global_event_listener.dart`, `lib/services/music_deewane_updater_tools.dart`, `lib/core/constants/setting_keys.dart`, `lib/screens/screen/explore_screen.dart`, `lib/screens/screen/home_views/setting_view.dart`
+
+### ADR-035: Player button layout redesign — scrollable pills, artwork seek zones, action icon row
+- **Date**: 2026-08-14
+- **Status**: Accepted
+- **Context**: The player's secondary actions (like, download, lyrics, share, queue, timer, add to playlist) were hidden behind the overflow menu or only accessible via specific locations. Like was in the title row, download was in overflow only, lyrics was a single button below transport on mobile. No scrollable action row existed. Artwork only toggled lyrics on tap. Research of Spotify and YouTube Music revealed the standard pattern: horizontally scrollable action pills between song info and progress bar (YouTube Music) or below artwork (Spotify).
+- **Options considered**: Keep actions in overflow menu only (rejected — hidden, not discoverable); Spotify static icon row below transport (rejected — limited to what fits on screen); YouTube Music scrollable pills above timeline (chosen — maximum actions, always accessible). Artwork tap = lyrics (current, rejected — user wanted seek zones).
+- **Decision**: (1) **Artwork tap zones** (player_screen.dart, `CoverImageVolSlider`): Left half tap = -10s seek back, right half tap = +10s seek forward. Replaces single `onTap: onToggleLyrics`. Uses `GestureDetector.onTapUp` + `RenderBox.globalToLocal` to detect tap position. (2) **Scrollable action pills row** (mobile, player_screen.dart): New `_ActionPillsRow` widget — horizontal `ListView` with `BouncingScrollPhysics`. Contains: Like, Download, Lyrics, Share, Add to Queue, Timer, Add to Playlist. Each pill = icon + label in rounded container (20px radius). Active state = accent-colored background. Position: between `_SongInfoRow` and `_PlayerProgressBar` (YouTube Music pattern). (3) **Static action icon row** (desktop, player_screen.dart): New `_ActionIconRow` widget — horizontal `Row` of `OrganicIconButton` instances. Same actions as mobile pills. Position: below song title, above progress bar. (4) **Like moved from title row** (player_screen.dart): `_SongInfoRow` no longer contains `_LikeButton` or `_DownloadButton` — both moved to pills/icon row. Title row is now just title + artist. (5) **Reordered mobile layout**: Artwork → Title/Artist → Pills → Timeline → Transport (was: Artwork → Title/Artist+Like+Download → Timeline → Transport → Lyrics). (6) **New imports**: `share_plus`, `AddToPlaylistCubit`, `TimerView`. (7) **Removed lyrics line**: Mobile no longer has a separate lyrics button below transport — lyrics is in the pill row.
+- **Why**: YouTube Music's scrollable pill pattern is the most discoverable way to surface secondary actions — users can see and access all actions without opening a menu. Placing pills between song info and timeline matches the YouTube Music layout that users already know. Artwork seek zones (-10s/+10s) are a power-user feature from YouTube Music mobile — tapping the artwork area for seeking is intuitive and doesn't require visible buttons. Moving Like out of the title row cleans up the visual hierarchy.
+- **Consequences**: Mobile player now has 5 visual zones (artwork, title, pills, timeline, transport) instead of 4. All secondary actions are one tap away on mobile. Desktop has a static icon row that doesn't need scrolling. The overflow menu (`more_bottom_sheet.dart`) is unchanged — it still contains all actions as a fallback. Artwork no longer toggles lyrics — lyrics is accessed via the pill row.
+- **Affects**: `lib/screens/screen/player_screen.dart` (CoverImageVolSlider, PlayerCtrlWidgets, _SongInfoRow, new _ActionPillsRow, new _ActionPills, new _ActionIconRow, new _ActionIconBtn)
+
+### ADR-034: Sidebar nav items expanded, mini player bleed fixed, player expand mode
+- **Date**: 2026-08-14
+- **Status**: Accepted
+- **Context**: Multiple layout issues on desktop: (1) Mini player bled into the sidebar area because it was in `bottomNavigationBar` which spans the full scaffold width. (2) Sidebar only showed Home + Search nav items — missing Local and Offline. (3) Mini player was shown inside the collapsed sidebar, taking up space. (4) Full player always respected sidebar width — no way to view it fullscreen covering everything.
+- **Decision**: (1) **Mini player bleed fix** (global_footer.dart): Moved `MiniPlayerWidget` from `bottomNavigationBar` into a `Column` inside the `Expanded` content area. On mobile, mini player sits above the bottom nav bar. On desktop, mini player sits below the page view inside the content area. `bottomNavigationBar` now only contains `HorizontalNavBar` on mobile (null on desktop). (2) **Sidebar nav items** (global_footer.dart): Added Local (index 3, `MingCute.music_2_fill`) and Offline (index 4, `MingCute.folder_download_fill`) to `_navItems` list. Added `navLocal` and `navOffline` label mappings in `_getLabel`. Collapsed sidebar now shows 5 icons: Home, Search, Local, Offline, Library. (3) **Mini player removed from sidebar** (global_footer.dart): Removed the `MiniPlayerWidget` from the collapsed sidebar view. Sidebar now only shows nav items and playlist list. (4) **Player expand mode** (player_overlay_wrapper.dart, player_screen.dart): New `PlayerExpandNotifier` InheritedWidget with `ValueNotifier<bool>`. Default mode: player respects sidebar width (`Padding(left: sidebarWidth)`). Expand button in player AppBar toggles `_expanded` state — when true, `sidebarWidth` is set to 0, player covers everything. Expand/exit icons from MingCute (`fullscreen_line`/`fullscreen_exit_line`).
+- **Why**: The mini player bleed was a real visual bug — it extended into the sidebar area on desktop. Adding Local and Offline to the sidebar matches the mobile bottom nav (which already has all 5 tabs). Removing mini player from sidebar collapsed view cleans up the sidebar. The expand mode gives users flexibility — default preserves navigation context, expand gives immersive experience.
+- **Consequences**: Desktop layout is now: sidebar (72/280px) | content area (page view + mini player). Mini player no longer spans full width on desktop. Sidebar has all 5 navigation items matching mobile. Full player has a visible expand/exit toggle in AppBar.
+- **Affects**: `lib/screens/widgets/global_footer.dart`, `lib/screens/widgets/player_overlay_wrapper.dart`, `lib/screens/screen/player_screen.dart`
+
+### ADR-033: UX refinements — single ForYou artist, default onboarding artists, sidebar-aware player, tappable library header
+- **Date**: 2026-08-14
+- **Status**: Accepted
+- **Context**: User reported 4 UX issues: (1) "Because you listened to..." showed multiple groups for every artist, overwhelming the Explore screen. (2) Onboarding artist search required typing with no suggestions — bad for new users. (3) Full player overlay covered the sidebar on desktop, losing navigation context. (4) Library section header was not interactive — users expected it to navigate to Library.
+- **Decision**: (1) **ForYou → single top artist** (recommendation_cubit.dart, recommendation_state.dart, for_you_section.dart): Cubit now picks the single most-played artist and filters tracks to that artist only. Added `topArtistName` to state. Widget renders one "Because you listened to {artist}" group. (2) **Default artists by locale** (default_artists.dart — new, onboarding_overlay.dart): New file with map of `languageCode → List<artist>` (12 per locale: hi, en, ko, ja, es, de, zh + fallback). Shown in `_StepArtists` when search is empty. Also shown in `_buildNoPluginsHint` so users can select without plugins. (3) **Player overlay respects sidebar** (player_overlay_wrapper.dart, global_footer.dart): Added `SidebarWidthNotifier` InheritedWidget. On desktop, player overlay gets `Padding(left: sidebarWidth)`. GlobalFooter tracks sidebar state and provides width. On mobile, no change. (4) **Library header tappable** (global_footer.dart): Library header wrapped in `InkWell` navigating to Library tab. (5) **Build fix**: `navigationShell` → `widget.navigationShell` in `_GlobalFooterState._handleHardwareBackPress` (forgotten when converting StatelessWidget → StatefulWidget). (6) Removed unused `appui_setting.dart` import in `setting_view.dart`.
+- **Why**: Multiple artist groups clutter the home screen — one top-artist section is cleaner and more actionable (Spotify shows one "Made for You" section, not per-artist). Default artists reduce onboarding friction — users see familiar names immediately. Sidebar-aware player preserves navigation context — users can still switch tabs while the player is open. Tappable library header is expected UX — the library icon should navigate to the library.
+
+### ADR-032: UX fixes & sidebar redesign — onboarding, Spotify sidebar, For You grids, bug fixes
+- **Date**: 2026-08-14
+- **Status**: Accepted
+- **Context**: Multiple UX issues identified: (1) Artist view in onboarding loaded before plugins, no skip button, wrong step order. (2) Desktop sidebar was a plain NavigationRail with no playlists, no search, not collapsible. (3) For You section was horizontal scroll cards with fixed 150px width, no topic grouping. (4) TopPicks refresh button was a no-op, page dots were hardcoded to first dot. (5) RecommendationCubit applyFavoriteArtists had a bug (daysAgo always 0). (6) No search button in the discover bar.
+- **Options considered**: Keep NavigationRail (rejected — user explicitly wanted Spotify-style); rebuild entire navigation (rejected — YAGNI, 5-tab structure works); fix only sidebar (rejected — onboarding bugs are critical UX); fix only bugs (rejected — sidebar is the biggest visual change).
+- **Decision**: (1) **Onboarding** (onboarding_overlay.dart): Reordered steps — Language/Country → Music Language → Artist Selection. Added skip button (calls `_finish()` directly). Added `BlocListener<PluginBloc>` to `_StepArtists` for late-loading plugins. Fixed `canProceed` check to reference step 2 (not 1). (2) **Desktop sidebar** (global_footer.dart): Replaced `VerticalNavBar` (NavigationRail) with `_SpotifySidebar` — 72px collapsed (icons only), 280px expanded (icons + labels + playlist list). Toggle button at top. Nav items: Home + Search. "Your Library" header. Playlist items from `LibraryItemsCubit` (pinned first, then unpinned). Each playlist: 32×32 cover art + name, tap → navigate to playlist view. Animated width transition (200ms). MiniPlayer shown in collapsed state. (3) **For You** (for_you_section.dart): Replaced horizontal card list with topic-grouped paginated grids. Tracks grouped by artist reason. Each group: "Because you listened to [Artist]" header + PageView grid (3×3 mobile, 5×4 desktop) + page dots. Card design matches TopPicks (album art + gradient scrim + title/artist). (4) **TopPicks** (top_picks_widget.dart): Added PageController with listener for page tracking. Refresh now shuffles tracks client-side. Page dots track actual current page. (5) **RecommendationCubit** (recommendation_cubit.dart): Fixed `applyFavoriteArtists` — replaced broken daysAgo calculation with full recomputation via `_fetchRecommendations()`. (6) **Explore** (explore_screen.dart): Added `SearchIcon` to `CustomDiscoverBar` that navigates to `/Search`.
+- **Why**: The onboarding skip button and step reorder follow "More Options Make Users Quit" (Design Psychology ch. 28) — fewer mandatory steps = higher completion. The Spotify sidebar pattern is the industry standard for desktop music apps — collapsible, playlist-centric, familiar to users coming from Spotify. Topic-grouped For You grids show more content in less space and provide context ("Because you listened to..."). The bug fixes address real broken functionality (refresh, page dots, recommendation scoring).
+- **Consequences**: Desktop users get a familiar Spotify-like navigation experience. Onboarding is faster with the skip option. For You section is more useful with topic context. TopPicks actually refreshes and tracks pages correctly. Recommendation scoring is accurate. Search is accessible from the discover bar. 6 files modified, ~500 lines changed. `dart analyze` 0 issues, `dart format` clean.
+- **Affects**: `lib/screens/widgets/onboarding_overlay.dart`, `lib/screens/widgets/global_footer.dart`, `lib/screens/widgets/for_you_section.dart`, `lib/screens/widgets/top_picks_widget.dart`, `lib/blocs/explore/cubit/recommendation_cubit.dart`, `lib/screens/screen/explore_screen.dart`, `lib/l10n/app_en.arb`
+
+### ADR-031: Frontend marketing site — Spotify-inspired redesign with alternating feature rows
+- **Date**: 2026-08-14
+- **Status**: Accepted
+- **Context**: User requested enhancing the marketing site to be more professional based on real design research. Key changes: adopt Spotify's alternating image-text feature containers (zigzag pattern), improve footer with multi-tier categorized columns, enhance hero with product mockup and social proof strip. Research from Shadcnblocks, Awwwards, NNGroup, Web Anatomy, and Spotify Premium page analysis.
+- **Options considered**: Keep original 3-column card grid (rejected — too generic, doesn't match professional patterns); adopt alternating zigzag rows (chosen — proven pattern from Spotify, Shadcnblocks, used by top SaaS sites); add parallax effects (rejected — unnecessary complexity, YAGNI).
+- **Decision**: Complete rebuild of index.html, style.css, and main.js. New structure: split hero (text left, interactive mockup right), social proof strip (4 trust signals), alternating zigzag feature rows (4 features with colored image frames), stats band, download grid with platform availability strip, open source section, multi-tier footer (CTA banner → 4-column categorized links → bottom bar with logo/social/legal). Warm teal theme maintained. GSAP animations updated for new sections.
+- **Why**: Alternating image-text rows are the #1 pattern for feature sections on professional SaaS/marketing sites (Spotify Premium, Shadcnblocks, Awwwards research). Multi-tier footer with categorized columns improves information architecture and discoverability. Social proof strip builds trust immediately below hero. Split hero with mockup gives visual context to the product.
+- **Consequences**: Site now follows proven UX patterns from major music/streaming platforms. More professional appearance. Slightly more HTML/CSS complexity but well within maintainable limits. Download URLs still placeholder. No dynamic content — all updates require code changes.
+- **Affects**: `frontend/index.html`, `frontend/css/style.css`, `frontend/js/main.js` (complete rewrite)
+
+### ADR-030: Smart recommendations & onboarding wizard
+- **Date**: 2026-08-14
+- **Status**: Accepted
+- **Context**: User requested Spotify/YouTube Music-style personalized recommendations without AI/ML. Current "TopPicks" was just the last 15 played tracks shuffled randomly — no personalization, no artist affinity, no music language filtering. Onboarding only collected language + country, missing the opportunity to gather preference data. No post-onboarding way to update preferences.
+- **Options considered**: AI/ML-based recommendations (rejected — no server, single-user app); pure history-based (rejected — less personalized); collaborative filtering (rejected — single-user, no server for co-occurrence); weighted history + artist affinity (chosen — no server needed, uses existing data); genre-based filtering (rejected — requires genre metadata from plugins which is inconsistent).
+- **Decision**: (1) **Multi-step onboarding wizard** — 3 steps: Step 1 (Language + Country, existing UI preserved), Step 2 (Artist Search & Selection — 3-5 minimum via plugin ContentBloc search, circular cards with checkmarks, skip if plugins not loaded), Step 3 (Music Language Preference — multi-select from 18 language chips). PageView with step indicator. (2) **New settings** — `musicLanguages` (JSON list of language codes) and `favoriteArtists` (JSON list of `{id, name}` maps) added to SettingKeys, SettingsState, SettingsCubit with full load/save lifecycle. (3) **RecommendationCubit** — exponential decay recency scoring (e^(-days/7)), artist frequency weighting from play history, top-10 artist boost (1.5x multiplier), watches history for auto-refresh. (4) **ForYouSection** — horizontal scroll card list below TopPicks on Explore screen, shows "Because you listened to [artist]" context. (5) **ManagePreferencesScreen** — Settings page to update favorite artists and music languages post-onboarding. (6) **~12 new l10n ARB keys** for onboarding steps, For You section, and manage preferences.
+- **Why**: Spotify and YouTube Music both collect artist preferences during onboarding to seed their recommendation engines. The weighted history approach works without a server — recent plays matter more, favorite artists get boosted, and music language preferences can filter content. The 3-step wizard follows Spotify's "one decision per screen" pattern. Artists are searched via the existing plugin ContentBloc (no new data source needed). Post-onboarding access via Settings lets users update preferences as their taste evolves.
+- **Consequences**: Onboarding is now 3 steps instead of 1 (slightly longer first launch, but skip-able). The "For You" section appears below TopPicks — two personalized sections on Explore. History is the primary data source — new users with no history get an empty "For You" section until they play music. Plugin loading happens after onboarding, so artist search shows a "not loaded yet" hint during onboarding (users can set preferences later in Settings).
+- **Affects**: `lib/screens/widgets/onboarding_overlay.dart` (rewritten), `lib/blocs/explore/cubit/recommendation_cubit.dart` (new), `lib/blocs/explore/cubit/recommendation_state.dart` (new), `lib/screens/widgets/for_you_section.dart` (new), `lib/screens/screen/home_views/setting_views/manage_preferences_screen.dart` (new), `lib/core/constants/setting_keys.dart`, `lib/blocs/settings_cubit/cubit/settings_state.dart`, `lib/blocs/settings_cubit/cubit/settings_cubit.dart`, `lib/screens/screen/explore_screen.dart`, `lib/main.dart`, `lib/screens/screen/home_views/setting_view.dart`, `lib/l10n/app_en.arb`
+
+### ADR-029: Lyrics container removed, carousel removed, recently played removed, search source switching
+- **Date**: 2026-08-13
+- **Status**: Accepted
+- **Context**: User feedback on ADR-028 changes: (1) The glass morphism container (BackdropFilter blur + rounded border) on lyrics was wrong — lyrics should serve directly in the artwork space like Spotify/YouTube Music, not in a contained card. (2) The CaraouselWidget was still visible on the Explore screen overriding TopPicks — should be removed entirely. (3) RecentlyPlayedSection duplicated TopPicks — redundant. (4) Search fallback linked to external websites (YouTube Music, JioSaavn, YouTube Video) — user wanted in-app source switching between the three content plugins, not external links.
+- **Options considered**: Keep glass morphism on lyrics (rejected — user explicitly said remove the container); keep carousel for discoverability (rejected — user said remove entirely); keep RecentlyPlayed + TopPicks both (rejected — redundant); keep external links (rejected — user wanted in-app source switching).
+- **Decision**: (1) **Lyrics** (player_screen.dart): Removed Container/ClipRRect/BackdropFilter wrapping from `_buildNoLyrics`, `_buildPlainLyrics`, `_buildSyncedLyrics`. Lyrics now render directly in the artwork space with no container. Removed unused `dart:ui` import. (2) **Explore** (explore_screen.dart): Removed `CaraouselWidget()` and its import. Removed `RecentlyPlayedSection` class and `_RecentlyPlayedCard` class (~140 lines deleted). Removed unused `recently_cubit.dart` and `load_image.dart` imports. (3) **Search** (search_screen.dart): Replaced external `_SourceLink` buttons (url_launcher) with `ActionChip` source-switching chips. When search returns 0 results, shows available plugins as chips. Tapping a chip switches the active plugin and re-runs the search in-app. Removed `_SourceLink` class and `url_launcher` import.
+- **Why**: The glass morphism container added visual noise — lyrics should feel like they ARE the artwork, not a panel on top of it. The carousel was a leftover from the old layout that contradicted the ADR-026/ADR-027 redesign. RecentlyPlayed and TopPicks both show recently played tracks — duplication confuses users. External links break the user's flow — switching sources in-app keeps them in the experience.
+- **Consequences**: Player lyrics are now containerless (clean, direct). Explore screen is simpler (QuickAccessChips → TopPicks → Last.fm → Plugin sections). Search has in-app source switching via ActionChip buttons. `dart analyze` passes clean across all files.
+- **Affects**: `lib/screens/screen/player_screen.dart`, `lib/screens/screen/explore_screen.dart`, `lib/screens/screen/search_screen.dart`
+
+### ADR-028: UX error handling & empty states — cross-source fallback, offline banner, guided empty states, playback recovery
+- **Date**: 2026-08-13
+- **Status**: Accepted
+- **Context**: The UX audit against `States.md` revealed that most error states were dead ends — generic `SignBoardWidget` with no guidance, no recovery actions, no cross-source alternatives. Users hitting "No results found" had no next step. Offline users saw per-screen errors with no persistent indicator. Playback failures offered no alternative sources. Empty library/downloads/playlists gave no guidance on how to populate them. Lyrics and import errors were generic with no actionable next steps.
+- **Options considered**: Full redesign of all error screens (rejected — massive scope, blocks shipping); fix only the top 3 critical paths (rejected — leaves most dead ends intact); comprehensive audit + targeted fixes across all major screens (chosen — 6 parallel agents, each focused on one domain).
+- **Decision**: (1) **Search** (search_screen.dart): Empty results now show cross-source fallback links (YouTube Music, JioSaavn, YouTube Video) via `launchUrl`. Offline shows cached history hint. Loading skeleton replaces spinner. (2) **Playback** (player_error_handler.dart, player_screen.dart): First retry shows brief "Having trouble..." toast. All retries exhausted suggests "Try another source or use Smart Replace". Queue finished shows "Add more music?" prompt. (3) **Network** (new offline_banner.dart, global_footer.dart): Persistent 40px `OfflineBanner` overlay slides in when offline, "Back online" snackbar on reconnection. Uses `ConnectivityCubit` + `AnimatedContainer`. (4) **Library/Downloads** (library_screen.dart, offline_screen.dart, playlist_screen.dart): Empty states replaced with action buttons — Search, Import, Scan Local, Browse Music, Add Songs. (5) **Lyrics** (fullscreen_lyrics_view.dart, lyrics_search.dart): Not-found view with "Search manually" + "Try LrcNet plugin" buttons. Timeout feedback at 8s/20s. Search hint text. (6) **Import** (import_process_screen.dart): Specific error messages per failure type (invalid URL, no plugin, timeout). Partial results summary. (7) **Plugins** (plugin_manager_screen.dart, global_event_listener.dart): Empty state with "Install Recommended" button. Health status dot (green/yellow). Install retry snackbar. All-failed critical dialog (once per session). Fixed `use_build_context_synchronously` in add_to_playlist_screen.dart (captured l10n before async).
+- **Why**: Every dead-end UX loses users permanently. The cost of each fix is tiny (10-60 lines) but the compound effect is that the app feels alive and helpful instead of broken. Cross-source fallback is the single highest-impact change — it directly addresses the core use case (finding music) when the primary path fails. The offline banner is the second highest — it prevents confusion on every screen simultaneously. Guided empty states convert confused new users into active users.
+- **Consequences**: ~450 lines added across 12 files. ~60 new ARB keys across 7 locales. One new file (`offline_banner.dart`, 40 lines). `flutter analyze` passes clean (0 issues). The `use_build_context_synchronously` fix in add_to_playlist_screen.dart was a pre-existing warning now resolved.
+- **Affects**: `lib/screens/screen/search_screen.dart`, `lib/services/player/player_error_handler.dart`, `lib/screens/screen/player_screen.dart`, `lib/screens/widgets/offline_banner.dart` (new), `lib/screens/widgets/global_footer.dart`, `lib/screens/screen/library_screen.dart`, `lib/screens/screen/offline_screen.dart`, `lib/screens/screen/library_views/playlist_screen.dart`, `lib/screens/screen/common_views/add_to_playlist_screen.dart`, `lib/screens/screen/player_views/fullscreen_lyrics_view.dart`, `lib/screens/screen/player_views/lyrics_search.dart`, `lib/screens/screen/library_views/import_process_screen.dart`, `lib/screens/screen/plugin_manager_screen.dart`, `lib/screens/widgets/global_event_listener.dart`, `lib/l10n/app_en.arb` + 6 locale files
+
+### ADR-027: UI polish — TopPicks grid, lyrics glass morphism, hover wrapper, carousel removal, recently played, logo, button spacing
+- **Date**: 2026-08-13
+- **Status**: Accepted
+- **Context**: User requested multiple UI improvements: (1) TopPicksWidget should use grid layout (3×3 mobile, 5×4 desktop) instead of horizontal scroll. (2) Lyrics view needs glass morphism background and should be more discoverable. (3) Hover wrapper needs proper integration in queue buttons. (4) Carousel card is not professional and should be removed. (5) Add more content to top section like favorite artists. (6) Integrate new logo.jpeg and remove Bloom Tunes logo. (7) Music player buttons need proper spacing.
+- **Options considered**: Keep horizontal scroll for TopPicks (rejected — user explicitly wants grid); keep carousel (rejected — user says not professional); add favorite artists API integration (rejected — no existing API, YAGNI); keep old logo (rejected — user wants new logo).
+- **Decision**: (1) TopPicksWidget reverted to grid layout with PageView pagination (3×3 mobile, 5×4 desktop). (2) Lyrics views now have glass morphism background (backdrop blur + translucent surface + border). (3) ClearQueueButton in UpNextPanel now has hover effects. (4) Removed unused CarouselCardView widget. (5) Added RecentlyPlayedSection to Explore screen showing listening history. (6) Integrated new logo.jpeg, replaced bloomee_new_logo_c.png references in load_image.dart, pallete_generator.dart, pubspec.yaml. (7) Increased player button spacing (16→20px between main controls, 12→16px for secondary).
+- **Why**: User feedback on previous changes. Grid layout shows more content in less space. Glass morphism matches premium design aesthetic. Hover effects improve desktop UX. Carousel was unused and cluttering the codebase. Recently played section adds personalization. New logo establishes brand identity. Better spacing improves touch targets and visual comfort.
+- **Consequences**: TopPicks now shows 9 items per page on mobile, 20 on desktop. Lyrics view has premium glass effect. ClearQueueButton is more interactive on desktop. CarouselCardView deleted (was unused). Recently played section adds horizontal scroll of listening history. Logo references updated across codebase. Player controls have better visual separation.
+- **Affects**: `lib/screens/widgets/top_picks_widget.dart`, `lib/screens/screen/player_screen.dart`, `lib/screens/widgets/up_next_panel.dart`, `lib/screens/screen/explore_screen.dart`, `lib/screens/widgets/carousel_card_widget.dart` (deleted), `lib/utils/load_image.dart`, `lib/utils/pallete_generator.dart`, `pubspec.yaml`
+
+### ADR-025: Player UX refined — industry-standard layout, volume fix, lyrics auto-scroll, loop popup
+- **Date**: 2026-08-13
+- **Status**: Accepted
+- **Context**: After ADR-023, the player had 3 horizontal rows of controls (transport, seek, secondary) plus a separate volume slider row on desktop — visually cluttered and not matching industry standards. Research of Spotify DESIGN.md and YouTube Music's 2025 redesign revealed the standard pattern: 1 main transport row centered (Shuffle | Prev | Play | Next | Repeat) with secondary actions below. ±10s seek is a desktop-only feature (keyboard shortcuts on Spotify, not visible buttons on mobile). The volume slider had a race condition. Inline lyrics required manual scrolling. The loop popup menu didn't open on tap.
+- **Options considered**: Keep 3-line layout (rejected — doesn't match Spotify/YouTube Music); put ±10s in main transport row on mobile (rejected — Spotify/YouTube Music don't do this, too cluttered); put all secondary buttons on same line as transport (rejected — Spotify puts them on a separate row below).
+- **Decision**: (1) **Mobile layout** (≤ tablet): Line 1 = [Shuffle] [Prev] [Play] [Next] [Repeat]; Line 2 = [Lyrics] only. Matches Spotify/YouTube Music mobile exactly. (2) **Desktop layout** (> tablet): Line 1 = [Shuffle] [-10s] [Prev] [Play] [Next] [+10s] [Repeat] [Volume slider]; no second line needed. ±10s visible only on desktop where keyboard shortcuts exist. (3) Volume slider fix: set `_isDragging = true` before `_setVolume()` in `onChanged`. (4) Inline lyrics: `ScrollablePositionedList` with auto-scroll to center (alignment 0.4), user scroll pauses 3s. (5) Loop popup: removed `onPressed: () {}` from `OrganicIconButton` child. (6) `OrganicIconButton` only creates `InkWell` when `onPressed != null`. (7) Responsive spacing: adaptive padding (20 mobile / 32 desktop).
+- **Why**: Spotify's DESIGN.md shows the definitive pattern: transport centered, secondary below, volume only on desktop. YouTube Music's 2025 redesign converged on the same layout. ±10s is a power-user feature (keyboard Alt+←/→) — putting it on mobile would violate the "5 buttons max" transport row convention. The race condition was a real bug. Lyrics auto-scroll eliminates friction. Loop popup was broken by InkWell consuming taps.
+- **Consequences**: Player controls now match the industry standard layout that users already know from Spotify/YouTube Music. Mobile is cleaner (2 rows, 5+1 buttons). Desktop has full controls with ±10s and inline volume. `OrganicIconButton` with null `onPressed` is now a valid pattern for use inside `PopupMenuButton`.
+- **Affects**: `lib/screens/screen/player_screen.dart`, `lib/screens/widgets/organic_player_control.dart`
+
+### ADR-026: Home section redesign — QuickAccessChips, horizontal TopPicks, chart carousel repositioned
+- **Date**: 2026-08-13
+- **Status**: Accepted
+- **Context**: The Explore screen's section order didn't match industry patterns. Research of Spotify's desktop home and YouTube Music's home (both desktop and mobile) revealed a consistent pattern: personalized content first (recently played, quick picks), discovery content lower (charts, new releases, recommendations). The current layout had the chart carousel at the very top (position 2), pushing personalized content (TopPicks grid) below it. Both competitors place personalized/recent content at the very top, followed by horizontal scroll rows, then discovery/featured content. Additionally, Spotify and YouTube Music both have a quick-access chip/pill row at the top for instant access to Liked Songs, playlists, and artists — Music_Deewane had no equivalent.
+- **Options considered**: Keep chart carousel at top (rejected — both competitors put personalized content first); add activity/mood filter pills (rejected — no data source for this yet, YAGNI); convert TopPicks to horizontal scroll only (chosen — matches both competitors); add QuickAccessChips (chosen — matches Spotify's quick-access grid and YouTube Music's "Listen Again").
+- **Decision**: (1) **New section order**: DiscoverBar → QuickAccessChips → TopPicksWidget → TabSongListWidget (Last.fm) → CaraouselWidget (charts) → _HomeSectionsList (plugins). Chart carousel moved from position 2 to position 4. (2) **QuickAccessChips**: New ~100-line widget in `explore_screen.dart`. Horizontal scrollable row of tappable pill chips showing user playlists from `LibraryItemsCubit`. Pinned playlists first, then unpinned. Each chip: cover art thumbnail (22×22) + playlist name, rounded pill (9999px radius), `surfaceColor` background, hover tint. Tapping navigates to the playlist via `context.pushNamed(RoutePaths.playlistView)`. (3) **TopPicksWidget** converted from paginated grid (PageView + GridView.count + dot pagination) to horizontal scroll (ListView.builder, 150px wide cards, horizontal padding). Removed `PageController`, `_currentPage`, `_shuffleAndReset`, dot pagination. Added desktop arrow navigation (reuse Hoverable + left/right icons from HorizontalCardView pattern). Refresh button re-shuffles by calling `setState`. Cards unchanged (existing `_TopPickCard` with gradient scrim + title/artist overlay + press/hover effects).
+- **Why**: Spotify's home starts with a quick-access grid (Liked Songs + 5 recently played playlists in 3×2), followed by horizontal scroll rows. YouTube Music's home starts with "Listen Again" (3×2 grid of recently played), followed by "Quick Picks" horizontal carousel. Both put charts/discovery content lower. The quick-access chip row is a standard pattern for instant access to frequently-used playlists without scrolling through the full library. Horizontal scroll for recently played shows more items in less vertical space and matches both competitors' patterns.
+- **Consequences**: The home screen now follows the same layout hierarchy as Spotify and YouTube Music — users coming from those apps will find the layout familiar. Charts are one scroll down instead of the first thing, which is better for returning users who want to resume listening. QuickAccessChips provides one-tap access to playlists. The TopPicksWidget is now more compact (no page dots, no page transitions) and shows all tracks in a single scrollable row. Desktop users get arrow navigation for the horizontal scroll. `flutter analyze` passes with 0 issues.
+- **Affects**: `lib/screens/screen/explore_screen.dart` (QuickAccessChips added, sliver reorder), `lib/screens/widgets/top_picks_widget.dart` (grid → horizontal scroll)
+
+### ADR-024: Fix Flutter 3.44 / Dart 3.12 build errors + Android SDK/dependency upgrades
+- **Date**: 2026-08-13
+- **Status**: Accepted
+- **Context**: After upgrading to Flutter 3.44.9 / Dart 3.12.2, the project had multiple build errors and 51 analyzer warnings. Key issues: `file_picker` 6.x→12.x breaking change (`FilePicker.platform` → static methods), `dart:ffi` `nativeFree` deprecated (needed `ffi: ^2.2.0` override), Isar schema `.g.dart` files out of sync with models, `compileSdk` too low for `permission_handler_android` 14.0.0 (needs SDK 37 which doesn't exist as stable), and Gradle/AGP/Kotlin versions too old for the new Dart SDK. CI Android build failed because `platforms;android-37` is not available in the stable SDK channel — Android 17 (API 37) is still in beta.
+- **Options considered**: Pin Flutter back to older version (rejected — loses VS 2026 CI support from ADR-014); install Android 17 preview SDK in CI (rejected — unstable, may break); downgrade `permission_handler` to 12.x which requires compileSdk 35 (chosen — stable, works with SDK 36); ignore analyzer warnings (rejected — technical debt accumulates).
+- **Decision**: (1) `file_picker` 6.2.1→12.0.2: replaced 8 `FilePicker.platform.*` calls with static `FilePicker.*` methods across 5 files. (2) `ffi` override updated `^1.1.2`→`^2.2.0` for `nativeFree` compatibility. (3) Isar `.g.dart` regenerated via `dart run build_runner build --delete-conflicting-outputs`. (4) `permission_handler` downgraded `^13.0.1`→`^12.0.3` (which uses compileSdk 35, compatible with SDK 36). (5) `compileSdk` set to `36` (latest stable). (6) Gradle `8.12.0`→`8.14.0`, AGP `8.9.1`→`8.11.1`, Kotlin `2.1.0`→`2.2.20`. (7) Android applicationId renamed `ls.bloomee.musicplayer`→`com.music_deewane` in build.gradle.kts, MainActivity.kt, share_targets.xml, Linux CMakeLists.txt, l10n ARBs; Kotlin source moved to `com/music_deewane/`. (8) Fixed all 51 analyzer info warnings: deprecated APIs (`EquatableMixin`, `allowMultiple`, `withData`, `picked.bytes`), super parameters (`Key? key`→`super.key`), library names, doc comment angle brackets, type patterns (`switch (state.runtimeType)`→`if/else if (state is X)`). (9) CI workflow: removed `setup-android` SDK 37 install step (no longer needed).
+- **Why**: Root-cause fixes for every build error. The permission_handler downgrade is necessary because `permission_handler_android 14.0.0` requires compileSdk 37, which is only available in the Android beta channel — the stable SDK tops out at API 36. All analyzer warnings fixed to keep the codebase clean and prevent future breakage from stricter lint rules.
+- **Consequences**: Project builds and analyzes cleanly on Flutter 3.44.9 / Dart 3.12.2. Android CI no longer needs SDK 37. `permission_handler` is at 12.x (not 13.x) — the `ACCESS_LOCAL_NETWORK` permission from Android 17 is not available until SDK 37 becomes stable. The applicationId rename (`com.music_deewane`) means existing installs of the old `ls.bloomee.musicplayer` package won't be upgrade-in-place — this is intentional for the rebrand.
+- **Affects**: `pubspec.yaml`, `pubspec.lock`, `android/app/build.gradle.kts`, `android/settings.gradle.kts`, `android/gradle/wrapper/gradle-wrapper.properties`, `android/app/src/main/kotlin/com/music_deewane/MainActivity.kt`, `android/app/src/main/res/xml/share_targets.xml`, `linux/CMakeLists.txt`, `.github/workflows/release-android.yml`, 51 Dart files across `lib/`
+
+### ADR-023: Player controls polish — white buttons, ±10s seek, volume slider
+- **Date**: 2026-08-12
+- **Status**: Accepted
+- **Context**: After ADR-022 the transport buttons (loop, shuffle, skip, timer, lyrics, settings, external-link) were dark `surfaceColor` (`#18181B`) with white icons, while the play button was white with a black icon — an inconsistent two-tone. No seek-forward/backward buttons existed. The artwork-drag volume control (`VolumeDragController`) was the only way to adjust volume, and was invisible on desktop where drag gestures are unnatural. Timer, lyrics, settings, and external-link were stacked secondary buttons hidden behind the main transport row.
+- **Options considered**: Keep two-tone buttons (rejected — user explicitly wants all-white play-button style); add ±10s inside existing stacked columns (rejected — loses stacked secondary buttons from the row without a migration path); add volume as a persistent slider inside the 450px row (rejected — too cramped with 7+ transport buttons); add volume slider beside the controls row at desktop width (chosen).
+- **Decision**: (1) `OrganicIconButton` default flipped: inactive = white `accentColor2` bg + black icon (same as `PlayPauseButton`); active = dark `surfaceColor` bg + white icon (loop/shuffle on-cue preserved). (2) `PlayerControlsRow` restructured to 7 flat columns: [Loop] [−10s] [Prev] [Play] [Next] [+10s] [Shuffle]; `−10s`/`+10s` call `MusicDeewanePlayer.seekNSecBackward/Forward(Duration(seconds: 10))` (methods already existed for keyboard). (3) New `_PlayerVolumeControl` widget beside the row, visible only on tablet+desktop (`!ResponsiveBreakpoints.of(context).smallerOrEqualTo(TABLET)`): horizontal `Slider` + mute icon, subscribes to `engine.volumeStream`, Tooltip shows "Volume (↑/↓ keys)". (4) Timer/lyrics/settings/external-link moved into the existing `showMoreBottomSheet` via new `showPlayerActions: true` flag — still one tap away via the AppBar more icon. (5) `Alt+←/→` in `KeyboardShortcutsHandler` bumped from 5s to 10s to match the new on-screen buttons.
+- **Why**: White organic buttons unify the control language with the play button. ±10s is the standard YouTube/Spotify seek interval. A volume slider is the only sensible desktop control (drag-on-artwork is mobile-only). Secondary buttons moved to more sheet because 7 flat columns already fill the 450px row; stacked pairs would overflow.
+- **Consequences**: All player controls are now uniformly white by default, making the Void Monochrome language fully consistent. The more sheet gained 4 extra items at the top when `showPlayerActions: true`. ARB keys `playerSeekBack10`, `playerSeekForward10`, `playerVolumeHint`, `playerLoop`, `playerShuffle`, `playerTimer`, `playerLyrics`, `playerSettings`, `playerSkipPrevious`, `playerSkipNext` added to `app_en.arb`; other locales fall back to English.
+- **Affects**: `lib/screens/screen/player_screen.dart`, `lib/screens/widgets/organic_player_control.dart`, `lib/screens/widgets/more_bottom_sheet.dart`, `lib/l10n/app_en.arb`, `lib/services/keyboard_shortcuts_service.dart`
+
+### ADR-022: Void Monochrome redesign — player controls + theme
+- **Date**: 2026-08-12
+- **Status**: Accepted
+- **Context**: The app shipped the upstream Bloomee theme: a purple-tinted near-black (`#0A040C`) with a pink/red primary (`#FE385E`) and cyan secondary (`#0EA5E0`). The play/pause button animates pink↔blue and emitted a colored glow; the progress bar used colored gradients with a glow; the player had an ambient artwork-palette glow. The user (not color-trained) requested a black-and-white aesthetic matching their new logo (black background, white mark), with white replacing every red/blue accent, high-contrast playback controls, no glow, and an organic "flower-petal" control language.
+- **Options considered**: Keep the colored accents and only lighten (rejected — user explicitly wants monochrome); pure `#000000` background (rejected — flat/void, `#09090B` gives depth without tint); keep straight progress bar (rejected — user asked for an animated wave); keep the existing circle buttons (rejected — user asked for scalloped/organic shapes).
+- **Decision**: New **Void Monochrome** palette in `app_theme.dart` — `themeColor #09090B` (page), `surfaceColor #18181B`, `surfaceElevatedColor #27272A`, `borderColor #3F3F46`, `mutedColor #71717A`, `primaryColor1 #FAFAFA`, `accentColor1/accentColor2 #FFFFFF` (white accent), `accentColor2dark #09090B` (foreground on white). Play button: white scalloped flower (`OrganicScallopShape`, cos-modulated radius + per-petal seeded amplitude) with a black icon and a ~900 ms white particle "relief burst" on play (no color shift, no glow). All player controls converted to `OrganicIconButton` (dark surface + white icon; active = white surface + black icon). Replaced `GradientProgressBar` with `WaveProgressBar`: the played portion is an animated sine wave (phase from a 3.4 s repeat controller, frozen when paused) in flat white with a plain white thumb. Removed the ambient artwork glow (`AmbientImgShadowWidget`) and the red/blue LikeBtnWidget animation (now white-fill/gray-outline). Deleted dead `gradient_progress_bar.dart`.
+- **Why**: Monochrome = timeless, matches the brand logo, and gives maximum contrast (white on near-black, black on white). Organic scallops echo the logo's curved forms and soften the "void" aesthetic into premium/approachable. The relief burst gives instant joyful feedback on play without color. Removing glow/ambient-bleed keeps the player calm and clean per explicit user request ("make it simple").
+- **Consequences**: Every `accentColor2`/`accentColor1` reference app-wide is now white — a handful of white-on-white buttons were fixed (FilledButton/ElevatedButton theme foreground + onboarding, local music, timer, import/export, plugin manager, playlist, import process/media). `pallete_generator.dart` is retained (still used by playlist cover tint in `current_playlist_cubit.dart`) but no longer drives the player. Remaining screens (home/search/library/settings) inherit the neutral tokens automatically; a future pass can restyle them per the rest of the (formerly red/blue) accent usage if needed.
+- **Affects**: `lib/core/theme/app_theme.dart`, `lib/screens/screen/player_screen.dart`, `lib/screens/widgets/play_pause_widget.dart`, `lib/screens/widgets/organic_player_control.dart` (new), `lib/screens/widgets/wave_progress_bar.dart` (new), `lib/screens/widgets/mini_player_widget.dart`, `lib/screens/widgets/like_widget.dart`, `lib/screens/widgets/gradient_progress_bar.dart` (deleted), plus white-on-white fixes in ~10 more files
+
+### ADR-021: Add hover effects for desktop UI (subtle tint + hand cursor)
+- **Date**: 2026-08-12
+- **Status**: Accepted
+- **Context**: On desktop/web, moving the mouse over clickable elements (song cards, buttons, nav tabs) provided no visual feedback — no cursor change, no highlight. Users couldn't tell what was tappable vs static, creating a poor UX.
+- **Options considered**: Full theme-level hover system with centralized hover colors (rejected — over-engineered for current widget diversity, each widget uses different wrappers); add `MouseRegion` + tint directly to each widget (chosen — minimal, follows existing patterns in AlbumCard/ArtistCard/PlaylistCard); CSS-only solution (rejected — Flutter web, not web-native).
+- **Decision**: Added `MouseRegion` with `SystemMouseCursors.click` (hand cursor) + `AnimatedContainer` with white 5% opacity tint on hover to all clickable elements. Desktop-only (no mobile). Applied to: SongCardWidget, _ActionButton, SquareImgCard, CarouselCardView, ChartListTile, LibItemCard, SettingTile, HorizontalNavBar, VerticalNavBar, LikeBtnWidget, PlayPauseButton. Created reusable `HoverWrapper` widget for future use.
+- **Why**: Follows the existing pattern used in AlbumCard/ArtistCard/PlaylistCard (proven in codebase). Direct widget-level approach avoids unnecessary abstraction. White 5% opacity tint matches the dark theme and existing `hoverColor` values in ChartListTile/LibItemCard.
+- **Consequences**: All clickable elements now show visual feedback on hover. The `HoverWrapper` widget is available for future widgets but not forced on existing ones (each widget's unique structure required individual integration). Mobile users see no change (touch devices don't have hover).
+- **Affects**: `lib/screens/widgets/song_tile.dart`, `square_card.dart`, `carousel_card_widget.dart`, `chart_list_tile.dart`, `libitem_tile.dart`, `setting_tile.dart`, `global_footer.dart`, `like_widget.dart`, `play_pause_widget.dart`, new `hover_wrapper.dart`
+
+### ADR-020: Fix plugin bootstrap — Music_Deewane_factory fork
+- **Date**: 2026-08-12
+- **Status**: Accepted
+- **Context**: App showed "Setup incomplete — Some plugins could not be installed right now" on first launch. Root cause: `repositories.json` on the `ghpage` branch (served by GitHub Pages) was UTF-16LE encoded and pointed to `https://aditya452007.github.io/Music_Deewane/plugins/` which returned `{"plugins": []}` — an empty, broken plugin repository. The upstream BloomeeTunes pointed to `kojima-ui/bloom-factory` (12 working plugins), but Music_Deewane had no working plugin source after the fork.
+- **Options considered**: Point directly to upstream `kojima-ui/bloom-factory` releases (rejected — dependency on external repo with no control); host plugins in the main Music_Deewane repo (rejected — mixes app code with plugin build artifacts); fork `kojima-ui/bloom-factory` as a separate repo under our control (chosen).
+- **Decision**: Forked `kojima-ui/bloom-factory` → `aditya452007/Music_Deewane_factory`. Updated `repositories.json` on the `ghpage` branch to point to `https://github.com/aditya452007/Music_Deewane_factory/releases/latest/download/bex-factory.json`. Deleted the unused `gh-pages` branch (was serving the broken UTF-16LE file). The factory repo has the full CI workflow (`bex-factory.yml`) that builds 12 `.bex` plugins from Rust source and publishes GitHub Releases.
+- **Why**: The factory fork gives us control over the plugin metadata while keeping the ability to sync upstream via `git merge upstream/main`. Download URLs point to GitHub Releases (stable, versioned). The `bex-factory.json` is auto-generated by the CI workflow on each release. No app code changes needed — only the `repositories.json` content on the Pages branch.
+- **Consequences**: Plugin bootstrap now finds and installs 12 plugins (ytmusic, jiosaavn, lrcnet, billboard, spotify/ytmusic/jiosaavn/apple-music importers, search suggestion providers). Future plugin updates: merge upstream + re-run workflow. The chain: app → `repositories.json` (ghpage) → `bex-factory.json` (factory releases) → `.bex` files (factory releases).
+- **Affects**: ghpage branch `repositories.json`, `context/flow.md` (external services table + plugin system diagram), `context/progress-tracker.md`
+
+### ADR-019: Fix Windows/Linux binary name (bloomee → Music Deewane)
+- **Date**: 2026-08-12
+- **Status**: Accepted
+- **Context**: Windows and Linux builds still produced `bloomee.exe` / `bloomee` binary because `windows/CMakeLists.txt` had `BINARY_NAME "bloomee"` and `linux/CMakeLists.txt` had the same. The CI workflow had a fragile `Rename-Item` step to rename the exe post-build, which was unreliable. `Runner.rc` metadata also still referenced "bloomee" for `InternalName` and `OriginalFilename`.
+- **Options considered**: Keep the CI rename step (rejected — fragile, breaks if the build output path changes, metadata still says "bloomee"); change BINARY_NAME at source (chosen — the binary is built with the correct name from the start).
+- **Decision**: Set `BINARY_NAME "Music Deewane"` in both `windows/CMakeLists.txt` and `linux/CMakeLists.txt`. Update `windows/runner/Runner.rc` `InternalName` and `OriginalFilename` to "Music Deewane" / "Music Deewane.exe". Remove the `Rename-Item` step from `release-windows.yml`. Also renamed the CMake project from `bloomee` to `music_deewane`.
+- **Why**: The binary should be built with the correct name at the CMake level, not renamed post-build. This eliminates the fragile rename step and ensures metadata is consistent.
+- **Consequences**: Windows and Linux builds now produce `Music Deewane.exe` / `Music Deewane` directly. CI no longer needs the rename step. `Runner.rc` metadata is consistent with the actual binary name.
+- **Affects**: windows/CMakeLists.txt, linux/CMakeLists.txt, windows/runner/Runner.rc, .github/workflows/release-windows.yml
+
+### ADR-018: Fix Windows build: C2338 MSVC error from deprecated /await compiler option
+- **Date**: 2026-08-11
+- **Status**: Accepted
+- **Context**: `flutter build windows --release` failed with C2338 MSVC error from `audio_service_win` and `permission_handler_windows` plugins about deprecated `/await` compiler option. The `/await`, `<experimental/coroutine>`, `<experimental/generator>`, and `<experimental/resumable>` headers are deprecated by Microsoft and will be REMOVED SOON. Need to define `_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS` to suppress the error.
+- **Options considered**: Patch only the failing test (rejected — masks a real compiler compatibility issue); downgrade Flutter (rejected — loses VS 2026 CI support); add define via vcxproj patch in CI (rejected — error happens DURING build, patching after is too late); add define at CMake level in app's `windows/CMakeLists.txt` (chosen — community-recommended, works before plugins compile).
+- **Decision**: Add `add_compile_definitions(_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)` to `windows/CMakeLists.txt` BEFORE the `APPLY_STANDARD_SETTINGS` function. This injects the define into all targets (including plugins) before compilation starts, suppressing the STL1011 static assertion error.
+- **Why**: Root-cause fix that unblocks the Windows exe release. The define silences the deprecation warning from Microsoft's experimental coroutine headers at the CMake level, allowing the build to succeed on GitHub Actions `windows-latest` with Visual Studio 2026. This is the community-recommended approach (flutter/flutter#186452, audioplayers#1985, permission-handler#1534).
+- **Consequences**: `flutter build windows --release` completes successfully. The fix is in the source code (CMakeLists.txt), not in CI, so it works both locally and in CI. No changes needed to Dart code or plugin internals. TODO: Remove once plugins migrate to C++20 standard coroutines.
+- **Affects**: windows/CMakeLists.txt
+
+### ADR-017: Fix Android release: build universal APK only, single .apk file
+- **Date**: 2026-08-11
+- **Status**: Accepted
+- **Context**: The CI was building `--split-per-abi` producing 4 separate APKs plus a universal APK that never existed (`app-universal-release.apk` missing because `isUniversalApk=false` with split ABI). User requested generating only one package from Android and not giving a zip file, direct APK file like the bloometune original release page.
+- **Options considered**: Keep building split ABIs + universal (rejected — generates 5 APKs, contradicts user request for single package); universal-only single build (chosen — produces one direct `.apk` file); two builds preserving all artifacts (rejected — overkill for single-package requirement).
+- **Decision**: Change `release-android.yml` to build only `flutter build apk --release` (universal APK only, no `--split-per-abi`), producing a single `app-release.apk`. Package as `music_deewane_android_v{version}.apk`. Updated release table to show one Android download.
+- **Why**: Simplifies the release package to match the bloometune original release page format — a single direct APK file rather than multiple split artifacts. Gradle cache makes the single build fast.
+- **Consequences**: CI generates one APK file instead of 5. Release table shows one Android download entry. Build time reduced by ~70% compared to dual-build approach.
+- **Affects**: .github/workflows/release-android.yml, release table format
+
+### ADR-015: Fix Android release packaging (universal + split APKs, setup-java v5)
+- **Date**: 2026-08-11
+- **Status**: Accepted
+- **Context**: `release-android.yml` packaged `build/app/outputs/flutter-apk/app-universal-release.apk` from a `--split-per-abi` build. Flutter's gradle plugin sets `isUniversalApk = false` when split-per-abi is enabled (`FlutterPlugin.kt`), so that file never exists -> `cp: cannot stat ... app-universal-release.apk` and the job failed. The run also showed `actions/setup-java@v4` and `actions/checkout@v4` Node.js 20 deprecation / setup-java v4 deprecation.
+- **Options considered**: Single `--split-per-abi` build and drop the universal APK (rejected — user wants a fat APK in the release table); universal-only single build (rejected — loses ABI-split artifacts); two builds preserving all 4 artifacts (chosen).
+- **Decision**: Build the universal APK with `flutter build apk --release` (produces `app-release.apk`) and the ABI-split APKs with `flutter build apk --release --split-per-abi` (produces `app-{armeabi-v7a,arm64-v8a,x86_64}-release.apk`); package all four; bump `actions/setup-java` to `@v5`. (`actions/checkout` was already `@v5` after ADR-014.)
+- **Why**: Root-cause fix for a filename that can never exist under split-per-abi; keeps the exact artifact set the release table advertises; clears the setup-java deprecation. Gradle cache makes the second build cheap.
+- **Consequences**: Android CI runs two `flutter build apk` invocations per release (~a few extra minutes, warm Gradle cache); outputs accumulate in the same `flutter-apk` dir so the universal from the first build is still present when the packaging step runs.
+- **Affects**: .github/workflows/release-android.yml
+
+### ADR-014: Fix broken CI/CD pipeline and a latent legacy-download migration bug
+- **Date**: 2026-08-11
+- **Status**: Accepted
+- **Context**: CI was failing in three ways. (1) `flutter build windows` failed with "Generator Visual Studio 16 2019 could not find any instance of Visual Studio" — the pinned Flutter 3.35.4 only maps VS major 17 → `Visual Studio 17 2022`, everything else falls back to the VS16 2019 generator string; on current `windows-latest` (VS 2026, major 18) that fallback fires and no VS 2019 exists. (2) `legacy_migration_service_test.dart` failed with `libisar.so: file too short` — a CI wget step wrote a truncated/404 error body into `libisar.so`, and Isar's auto-downloader skips download when the file already exists (`_downloadIsarCore` `if (await libraryFile.exists()) return;`). (3) Node.js 20 deprecation warnings from `actions/checkout@v4`. Separately, once the FFI issue was gone the migration test exposed a latent bug: legacy `DownloadDB.mediaId` lookup used the raw id so `youtubeyt-1` never matched the `yt-1` media item and downloads were silently dropped.
+- **Options considered**: Patch only the failing test (rejected — masks a real data-shape bug and still requires CI config fixes); pin Flutter to a floating `stable` (rejected — non-reproducible); pin to the exact local SDK 3.44.9 (chosen); add `-G`/`CMAKE_GENERATOR` hacks (rejected — newer Flutter derives the generator from the installed VS via vswhere; the env var is ignored, and VS17 2022 may not exist on the runner).
+- **Decision**: Bump `flutter-version` to `3.44.9` in all workflows (maps VS major 18 → `Visual Studio 18 2026` and 17 → 17 2022, so the detected VS is used correctly); delete the corrupt `wget` step from `checkout.yml` (let `Isar.initializeIsarCore(download: true)` in the test download the correct binary); bump `actions/checkout@v4` → `@v5` everywhere (Node 24); remove the inert `CMAKE_GENERATOR` env from `release-windows.yml`; fix `_buildMigrationPlan` to look up downloads via `_stripYoutubePrefix(download.mediaId)`.
+- **Why**: Root-cause fixes. Newest Flutter (matching the local 3.44.9 dev SDK) supports the current GitHub Windows image; deleting the broken wget restores Isar's documented auto-download path; the migration fix stops real production data loss while satisfying the test.
+- **Consequences**: Verified locally on 3.44.9: `flutter analyze --no-fatal-infos` = 0 errors, all 15 tests pass (previously 14 passed / 1 failed). Other workflows (android/linux) now build with the same SDK as local dev.
+- **Affects**: .github/workflows/checkout.yml, release-android.yml, release-linux.yml, release-windows.yml, deploy-site.yml, lib/services/db/legacy/legacy_migration_service.dart
+
+### ADR-013: Modularize CI/CD into platform workflows & upgrade action versions
+- **Date**: 2026-08-11
+- **Status**: Accepted
+- **Context**: The CI/CD pipeline was failing due to invalid action reference `actions/checkout@v5` (nonexistent major version), missing APK target file `app-release.apk` (replaced by `app-universal-release.apk` when ABI split is enabled), and monolithic bundling of Android/Windows on a single runner.
+- **Options considered**: Keep single monolithic `release.yml` with version patches (rejected — brittle, slow, harder to debug); split into isolated platform workflows (chosen).
+- **Decision**: Separated `release.yml` into `release-android.yml`, `release-windows.yml`, and `release-linux.yml`. Upgraded action versions to standard stable releases (`actions/checkout@v4`). Android build converted to `ubuntu-latest` with native Linux Gradle caching.
+- **Why**: Modular workflow files allow clear isolation of build failures per platform, faster execution for Android builds on Linux, and robust artifact packaging for releases.
+- **Consequences**: Each platform workflow triggers independently and publishes/updates GitHub release assets using `ncipollo/release-action@v1`.
+- **Affects**: .github/workflows/
+
+### ADR-012: Complete app rename (Bloomee → Music Deewane)
+- **Date**: 2026-08-11
+- **Status**: Accepted
+- **Context**: The app rename from Bloomee to Music Deewane was deferred to the branding phase (ADR-006). The mechanical rename has now been executed across the entire codebase.
+- **Options considered**: Keep Bloomee branding indefinitely (rejected — project identity requires distinct name); partial rename only (rejected — inconsistent); complete mechanical rename across all layers (chosen).
+- **Decision**: Completed the full mechanical rename covering: `pubspec.yaml name: music_deewane`, 170+ Dart files `package:Bloomee/` → `package:music_deewane/`, symbol renames (`BloomeeMusicPlayer→MusicDeewanePlayer`, `BloomeePlayerCubit→MusicDeewanePlayerCubit`, `BloomeeSwitch→MusicDeewaneSwitch`, `BloomeeDialog*→MusicDeewaneDialog*`, `getBloomeeMusicPlayer→getMusicDeewanePlayer`), Rust crate `rust_lib_Bloomee→rust_lib_music_deewane`, FRB regen, Windows/Linux/macOS/web identity updates, CI artifact names, exe name `Bloomee.exe→Music Deewane.exe`, About page credits, README, l10n ARBs.
+- **Why**: The rename was blocked on branding phase per ADR-006; now executed as a single cohesive change to establish project identity before UI redesign.
+- **Consequences**: ADR-006 is superseded. Functional identifiers intentionally preserved: package/bundle IDs (`ls.bloomee.musicplayer`), notification channel (`com.BloomeePlayer.notification.status`), updater/plugin URLs, DB/backup paths, M3U format tags, asset filenames, Discord asset key, test DB names, legacy DB comment. `dart format` and `cargo check` pass; `flutter test` limited by missing Isar native lib (pre-existing).
+- **Affects**: pubspec.yaml, all Dart imports/symbols, rust/Cargo.toml, rust_builder/, android/, ios/, windows/, linux/, macos/, web/, CI, l10n/, README.md
+
+### ADR-011: Adopt the Template AI framework as the development operating system
+- **Date**: 2026-08-11
+- **Status**: Accepted
+- **Context**: The Template's AI-development framework (Agent.md protocol, `.agents/` skills, `context/` living docs) was copied into Music_Deewane during initialization. It must be treated as the project's operating system, not as documentation to ignore.
+- **Options considered**: Use only ad-hoc agent habits (rejected — no design gate, no context persistence); cherry-pick parts of the template (rejected — the protocol is interdependent); adopt fully (chosen).
+- **Decision**: All future work follows Agent.md: design-first workflow with hard approval gate, skill loading before code, context sync after every task, three living files always updated.
+- **Why**: The template is specifically designed to be adapted to a project; its methodology prevents unapproved redesign and keeps state/history/flow legible to any future agent.
+- **Consequences**: Every task carries overhead (spec → clarify → approve); tasks without context sync are incomplete. Template files must not be rewritten out of unfamiliarity.
+- **Affects**: entire repo, all future work
+
+### ADR-010: Defer Skills.py + Spec Kit installation until development begins
+- **Date**: 2026-08-11
+- **Status**: Accepted
+- **Context**: Template ships `Skills.py` (installs community AI skills via npx: GSAP, Hallmark, Taste, Emil, Impeccable) and Spec Kit (`uv tool install specify-cli`, `specify init .`).
+- **Options considered**: Install now (adds package.json/`node_modules`-adjacent files and network installs before any need); never install (loses community skills and speckit SDLC commands); defer (chosen).
+- **Decision**: Run `python Skills.py -y` and Spec Kit setup only when the first design/development task begins (user decision 2026-08-11).
+- **Why**: YAGNI — nothing in discovery needs them; the embedded `.agents/` skills already cover this phase.
+- **Consequences**: Remember the Spec Kit step (Agent.md lists it as mandatory after Skills.py); SKILLS.md documents what will be available.
+- **Affects**: repo root, `.agents/skills/`, future SDLC workflow
+
+### ADR-009: Keep all six platforms first-class
+- **Date**: 2026-08-11
+- **Status**: Accepted
+- **Context**: Bloomee builds for Android, iOS, Windows, Linux, macOS, and Web.
+- **Options considered**: Drop platforms (rejected — no requirement to shrink); mobile-only or desktop-only focus (rejected by user); keep all (chosen).
+- **Decision**: All platform folders stay and remain in scope; no platform is deprecated.
+- **Why**: User decision (2026-08-11). Preserves the upstream's cross-platform positioning.
+- **Consequences**: iOS is currently unbuildable as committed (no Podfile, no UIBackgroundModes) — flagged in open questions; future platform work must not remove runners.
+- **Affects**: android/, ios/, windows/, linux/, macos/, web/
+
+### ADR-008: Full UI redesign planned later; Bloomee UI preserved for now
+- **Date**: 2026-08-11
+- **Status**: Accepted
+- **Context**: The Template's design skills exist, but the current app is the upstream Bloomee UI.
+- **Options considered**: Rebrand only (keep design, change colors/name); redesign fully later (chosen); undecided (rejected — ambiguity blocks planning).
+- **Decision**: Current Bloomee UI is preserved as-is. A full UI redesign is planned as a later phase, executed through the design-first workflow with `design-basics`/`premium-design`/`DESIGN-PSYCHOLOGY.md`.
+- **Why**: User decision (2026-08-11). Keeps the app shippable while the project defines its own visual identity.
+- **Consequences**: Until redesign starts, no one may "improve" colors/theme without approval; `ui-context.md` documents the current design language.
+- **Affects**: all UI, `ui-context.md`
+
+### ADR-007: Keep all current music providers/plugin ecosystem unchanged
+- **Date**: 2026-08-11
+- **Status**: Accepted
+- **Context**: Music playback comes from WASM plugins (content resolvers, chart/lyrics/search-suggestion providers, importers) installed from HTTP plugin repositories.
+- **Options considered**: Replace providers now (rejected — out of scope and breaks the app); keep and revisit (rejected — leaves ambiguity); keep all current providers (chosen).
+- **Decision**: The plugin system and its providers remain unchanged in Music_Deewane.
+- **Why**: User decision (2026-08-11). The plugin architecture is the app's strength; provider work is a separate future decision.
+- **Consequences**: Default catalogue still points at the upstream Bloomee repositories.json — revisit ownership when branding begins.
+- **Affects**: plugin system, `PluginBootstrapService`, rust/src/api/plugin
+
+### ADR-006: Defer app rename (Bloomee → Music_Deewane) to the branding phase
+- **Date**: 2026-08-11
+- **Status**: Accepted
+- **Context**: The app is still fully branded "Bloomee": `pubspec.yaml name: Bloomee`, 100+ `package:Bloomee` imports, Android applicationId `ls.bloomee.musicplayer`, iOS bundle id, Windows/Linux/macOS binary/app names, `rust_lib_Bloomee` crate + FFI plugin, web title/manifest, CI artifacts.
+- **Options considered**: Rename now (rejected — touches 100+ files across Dart/Rust/platforms; a broad change that belongs with branding); rename in a dedicated task later (chosen); never rename the package (rejected — project identity requires it eventually).
+- **Decision**: Rename is **deferred to the branding phase**. Until then everything stays "Bloomee". A future rename task must cover: pubspec name + all imports, `rust_lib_Bloomee` (Cargo.toml, rust_builder/, pubspec dependency, FRB regen), Android/iOS/desktop/web identifiers, CI artifact names, updater URLs.
+- **Why**: User decision (2026-08-11). Renaming now would churn the entire codebase during discovery with no product benefit yet.
+- **Consequences**: Recorded here and in `project-overview.md` so it is NOT forgotten; new code should not add new Bloomee branding where avoidable, but must not rename existing identity.
+- **Affects**: pubspec.yaml, all imports, platform identifiers, rust_builder/, CI
+
+### ADR-005: Diverge from upstream; BloomeeTunes is base only, no scheduled sync
+- **Date**: 2026-08-11
+- **Status**: Accepted
+- **Context**: Music_Deewane lives at `origin` = aditya452007/Music_Deewane; `upstream` = HemantKArya/BloomeeTunes.
+- **Options considered**: Scheduled periodic sync (rejected — divergence makes merges costly); track-only, never merge (rejected — no benefit over base-only); diverge, base only (chosen).
+- **Decision**: BloomeeTunes is the starting base only. No scheduled upstream synchronization. `upstream` remote kept for reference/manual cherry-picks when genuinely needed.
+- **Why**: User decision (2026-08-11). The project will diverge (rename, redesign); sync debt would grow.
+- **Consequences**: Upstream fixes must be re-applied manually; anyone syncing must review deliberately, never blindly.
+- **Affects**: git workflow, `upstream` remote
+
+### ADR-004: Music_Deewane forked from BloomeeTunes; one repo, origin + upstream
+- **Date**: 2026-08-11
+- **Status**: Accepted
+- **Context**: New project initialization task: clone BloomeeTunes as the base, integrate the Template AI framework (excluding Template's `.git`), push to the empty Music_Deewane repository.
+- **Options considered**: Fresh empty repo with copied source (loses history); use BloomeeTunes clone's history (chosen).
+- **Decision**: BloomeeTunes cloned into `Music_Deewane/`, its git history kept as the project's history; `origin` = https://github.com/aditya452007/Music_Deewane.git; `upstream` = BloomeeTunes; branch renamed `main`; Template files (140) added in commit `949c041`; pushed.
+- **Why**: One primary repository with full upstream history; template history not merged (no nested `.git`).
+- **Consequences**: History shows BloomeeTunes commits — the fork lineage is transparent; upstream sync decisions captured in ADR-005.
+- **Affects**: repo, all branches
+
+### ADR-003: Remove Scaffold.py — canonical trees are the source of truth
+- **Date**: 2026-08-11
+- **Status**: Accepted
+- **Context**: Scaffold.py generated a folder skeleton, but `npm install` / create-app already provides boilerplate. The generator produced a generic tree that ignored per-project needs and duplicated what the `folder-structure` skill already defines.
+- **Options considered**: Keep Scaffold.py but improve it (extra maintenance, still redundant with the skill); remove it and rely on the canonical trees (chosen).
+- **Decision**: Delete Scaffold.py. The `folder-structure` skill (`.agents/folder-structure/SKILL.md`) is the single source of truth; agents materialize its canonical trees by hand, creating only folders the product needs.
+- **Why**: One source of truth instead of two. The skill's trees are the "senior engineer" hierarchy — feature-first frontend, controller-service-repository backend. Remove the Python dependency from the workflow.
+- **Consequences**: Agents must create folders manually — the skill's Step 2 shows how. All docs updated (Agent.md, SKILLS.md, README.md, .agents/AGENTS.md).
+- **Affects**: repo root, `.agents/folder-structure/SKILL.md`, all docs referencing it
+
+### ADR-002: Add `flow.md` + `decision.md` as living context files
+- **Date**: 2026-08-11
+- **Status**: Accepted
+- **Context**: Agents couldn't understand the project instantly and didn't update context properly. `progress-tracker.md` alone didn't capture HOW the app works (function call maps, user flows) or WHY decisions were made.
+- **Options considered**: Fold this info into existing files (overloaded, no single "how/why" home); new dedicated files (chosen).
+- **Decision**: Create `context/flow.md` (Mermaid call maps, user flows, request/response, routes) and `context/decision.md` (append-only ADR log). Both are updated on EVERY task, alongside `progress-tracker.md`.
+- **Why**: Reading the three files (progress-tracker + flow + decision) gives state, structure, and rationale instantly. Decision log prevents re-deciding and preserves reasoning.
+- **Consequences**: Agents must keep diagrams in sync; stale diagrams are treated as bugs. Sync protocol is enforced via AGENTS.md + Agent.md.
+- **Affects**: `context/`, `AGENTS.md`, `Agent.md`, `SKILLS.md`, `.agents/AGENTS.md`, `ai-workflow-rules.md`

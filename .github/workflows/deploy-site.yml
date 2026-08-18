@@ -1,0 +1,27 @@
+name: Deploy Website
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ghpage/**"
+      - "deploy_page.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    name: Build & Publish ghpage branch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Build and deploy
+        run: python3 deploy_page.py
