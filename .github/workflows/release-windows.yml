@@ -64,16 +64,24 @@ jobs:
         run: |
           $v = "${{ steps.version.outputs.V_TAG }}"
           $releaseDir = "build/windows/x64/runner/Release"
-          Compress-Archive -Path "$releaseDir/*" -DestinationPath "music_deewane_windows_v${v}.zip"
+          $staging = "windows_artifacts"
+          New-Item -ItemType Directory -Path $staging -Force
+          # Move MSIX out of Release before zipping
+          if (Test-Path "$releaseDir/app.msix") {
+            Move-Item "$releaseDir/app.msix" "$staging/app.msix"
+          }
+          # Move EXE installer into staging
+          if (Test-Path "installer_output/MusicDeewaneSetup_*.exe") {
+            Get-Item "installer_output/MusicDeewaneSetup_*.exe" | Move-Item -Destination "$staging/"
+          }
+          # Zip only the Release folder (no MSIX inside)
+          Compress-Archive -Path "$releaseDir/*" -DestinationPath "$staging/music_deewane_windows_v${v}.zip"
 
       - name: Upload Windows Artifacts
         uses: actions/upload-artifact@v6
         with:
           name: release-assets-windows
-          path: |
-            music_deewane_windows_*.zip
-            build/windows/x64/runner/Release/app.msix
-            installer_output/MusicDeewaneSetup_*.exe
+          path: windows_artifacts/*
 
       - name: Create/Update GitHub Release
         uses: ncipollo/release-action@v1
@@ -96,9 +104,9 @@ jobs:
             | Windows (x64) MSIX | app.msix |
             | Windows (x64) Installer | MusicDeewaneSetup_${{ steps.version.outputs.VERSION }}.exe |
           artifacts: |
-            music_deewane_windows_*.zip
-            build/windows/x64/runner/Release/app.msix
-            installer_output/MusicDeewaneSetup_*.exe
+            windows_artifacts/music_deewane_windows_*.zip
+            windows_artifacts/app.msix
+            windows_artifacts/MusicDeewaneSetup_*.exe
           token: ${{ github.token }}
           allowUpdates: true
           replacesArtifacts: false
