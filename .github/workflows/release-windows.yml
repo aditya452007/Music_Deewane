@@ -56,7 +56,8 @@ jobs:
         run: winget install JRSoftware.InnoSetup --accept-package-agreements --accept-source-agreements
 
       - name: Compile Inno Setup Installer
-        run: "& 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' 'installer\windows\music_deewane.iss'"
+        shell: pwsh
+        run: Start-Process -FilePath 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' -ArgumentList 'installer\windows\music_deewane.iss' -Wait -NoNewWindow
 
       - name: Package Windows Artifacts
         shell: pwsh
