@@ -34,6 +34,7 @@
 ## Decision Index
 
 | ID | Date | Decision | Status | Affects |
+| ADR-041 | 2026-08-18 | Windows MSIX + Inno Setup installer: add both packaging formats to CI/CD pipeline | Accepted | pubspec.yaml, installer/windows/music_deewane.iss (new), release-windows.yml |
 | ADR-040 | 2026-08-18 | Reset git history: orphan single-commit main + ghpage, single-author repo, delete v1.0.1* tags | Accepted | git history, branches, tags |
 | ADR-039 | 2026-08-18 | Fix selected search chip: black text on white bg; bump unselected chip contrast further (corrects ADR-038) | Accepted | search_screen.dart |
 | ADR-038 | 2026-08-18 | Search chip contrast boost, semi-transparent text-selection highlight, Top Picks grid height computed from screen width | Accepted | search_screen.dart, app_theme.dart, top_picks_widget.dart |
@@ -101,6 +102,16 @@
 ## Decision Entries
 
 <!-- Newest decisions go at the top of this section. -->
+
+### ADR-041: Windows MSIX + Inno Setup installer
+- **Date**: 2026-08-18
+- **Status**: Accepted
+- **Context**: Windows CI/CD only produced a portable zip file. User wanted both modern MSIX (clean install/uninstall like Android APK) and classic Inno Setup .exe installer (desktop shortcuts, Start Menu, launch after install, custom install location). All three artifacts (zip, msix, exe) should be uploaded to GitHub releases.
+- **Options considered**: MSIX only (rejected — no desktop shortcuts, no custom install location); Inno Setup only (rejected — no modern Windows integration); both MSIX + Inno Setup + keep zip as portable fallback (chosen).
+- **Decision**: (1) Added `msix:` configuration block to `pubspec.yaml` — publisher "Music Deewane", identity "com.musicdeewane.app", capabilities internetClient + musicLibrary, logo from assets/icons/logo.png. (2) Created `installer/windows/music_deewane.iss` Inno Setup script — desktop shortcut, Start Menu shortcut, launch after install, custom install location, uninstaller, LZMA2 compression, x64 only. (3) Updated `release-windows.yml` — added MSIX creation step (`flutter pub run msix:create --version`), Inno Setup installation via `winget install JRSoftware.InnoSetup`, ISCC compilation step, upload all three artifacts to GitHub releases.
+- **Why**: MSIX is the modern Windows package format (closest to Android APK) with clean install/uninstall. Inno Setup .exe is the classic installer users expect with desktop shortcuts and "open after install". Zip kept as portable fallback for users who don't want to install.
+- **Consequences**: Windows releases now produce three artifacts: .zip (portable), .msix (modern), .exe (classic installer). MSIX requires no signing certificate for sideloading. Inno Setup is free and widely used. No Flutter/Dart code changes — only pubspec config + CI workflow + one new .iss file.
+- **Affects**: `pubspec.yaml`, `installer/windows/music_deewane.iss` (new), `.github/workflows/release-windows.yml`
 
 ### ADR-040: Reset git history — single-author, single-commit main + ghpage
 - **Date**: 2026-08-18

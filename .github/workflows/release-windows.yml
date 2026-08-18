@@ -49,6 +49,15 @@ jobs:
       - name: Build Windows
         run: flutter build windows --release --build-number ${{ github.run_number }}
 
+      - name: Create MSIX
+        run: flutter pub run msix:create --version ${{ steps.version.outputs.VERSION }}.0
+
+      - name: Install Inno Setup
+        run: winget install JRSoftware.InnoSetup --accept-package-agreements --accept-source-agreements
+
+      - name: Compile Inno Setup Installer
+        run: "& 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' 'installer\windows\music_deewane.iss'"
+
       - name: Package Windows Artifacts
         shell: pwsh
         run: |
@@ -60,7 +69,10 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: release-assets-windows
-          path: music_deewane_windows_*.zip
+          path: |
+            music_deewane_windows_*.zip
+            build/windows/x64/runner/Release/app.msix
+            installer_output/MusicDeewaneSetup_*.exe
 
       - name: Create/Update GitHub Release
         uses: ncipollo/release-action@v1
@@ -79,8 +91,13 @@ jobs:
             ### Windows Downloads
             | Platform | File |
             |----------|------|
-            | Windows (x64) | music_deewane_windows_v${{ steps.version.outputs.V_TAG }}.zip |
-          artifacts: music_deewane_windows_*.zip
+            | Windows (x64) Portable | music_deewane_windows_v${{ steps.version.outputs.V_TAG }}.zip |
+            | Windows (x64) MSIX | app.msix |
+            | Windows (x64) Installer | MusicDeewaneSetup_${{ steps.version.outputs.VERSION }}.exe |
+          artifacts: |
+            music_deewane_windows_*.zip
+            build/windows/x64/runner/Release/app.msix
+            installer_output/MusicDeewaneSetup_*.exe
           token: ${{ github.token }}
           allowUpdates: true
           replacesArtifacts: false

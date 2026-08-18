@@ -274,8 +274,11 @@ graph TD
     subgraph "Windows Pipeline (Windows)"
         Windows --> W1[Setup Rust, Flutter]
         W1 --> W2[flutter build windows --release]
-        W2 --> W3[Package music_deewane_windows_*.zip]
-        W3 --> W4[ncipollo/release-action@v1]
+        W2 --> W3[Create MSIX]
+        W3 --> W4[Install Inno Setup]
+        W4 --> W5[Compile Inno Setup Installer]
+        W5 --> W6[Package zip]
+        W6 --> W7[Upload zip + msix + exe to release]
     end
 
     subgraph "Linux Pipeline (Ubuntu)"

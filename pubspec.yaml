@@ -101,6 +101,7 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   freezed: ^3.2.3
+  msix: ^3.18.0
   
 
 flutter_launcher_icons:
@@ -117,7 +118,19 @@ flutter_launcher_icons:
   windows:
     generate: true
     image_path: "assets/icons/logo.png"
-    
+
+msix:
+  display_name: Music Deewane
+  publisher_display_name: Music Deewane
+  identity_name: com.musicdeewane.app
+  msix_version: 1.0.1.0
+  logo_path: assets/icons/logo.png
+  capabilities: internetClient, musicLibrary
+  languages: en-us, hi-in
+  file_extension: .msix
+  install_certificate_location: localMachine
+  update_blocks_app_install: true
+  store: false
 
 # The following section is specific to Flutter packages.
 flutter:
