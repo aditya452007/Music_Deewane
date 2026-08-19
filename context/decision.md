@@ -34,6 +34,7 @@
 ## Decision Index
 
 | ID | Date | Decision | Status | Affects |
+| ADR-045 | 2026-08-19 | Updater GitHub-only: delete SourceForge fallback entirely; Linux CI apt step made resilient (retry + 10-min timeout) | Accepted | music_deewane_updater_tools.dart, release-linux.yml |
 | ADR-044 | 2026-08-19 | Updater bug fixes: modulo 1000 boundary, emoji removal, duplicate checks, hardcoded URL, Linux support, changelog flow | Accepted | music_deewane_updater_tools.dart, global_events_cubit.dart, notification_cubit.dart, 7 locale ARB files |
 | ADR-043 | 2026-08-19 | Plugin ID rebranding — bloomfactory → musicdeewanefactory across manifests + Dart constants | Accepted | Music_Deewane_factory manifests, legacy_media_id_mapper.dart, legacy_migration_service.dart |
 | ADR-042 | 2026-08-18 | In-app update: download from GitHub releases with progress + platform install | Accepted | update_service.dart (new), global_events_cubit.dart, global_event_listener.dart, check_update_view.dart, pubspec.yaml |
@@ -115,6 +116,16 @@
 ## Decision Entries
 
 <!-- Newest decisions go at the top of this section. -->
+
+### ADR-045: Updater GitHub-only — SourceForge fallback removed; Linux CI apt resilience
+- **Date**: 2026-08-19
+- **Status**: Accepted
+- **Context**: The update dialog kept appearing even though the user was on the latest GitHub release. `getAppUpdates()` fell back to `sourceforgeUpdate()` (SourceForge `best_release.json`) whenever the GitHub check failed (rate limit / network), and the stale SourceForge releases produced a false "update available" result with an old download URL. Separately, the Linux release workflow (run #58) stalled 29 minutes in the "Install Linux build dependencies" (apt-get) step and had to be cancelled, while runs #55/#56 completed in ~5 minutes — a flaky Ubuntu mirror hang, not a build problem.
+- **Options considered**: Keep SourceForge as fallback (rejected — user explicitly wants GitHub latest release only; stale data causes false update prompts). Remove fallback, GitHub only (chosen). Keep apt step as-is (rejected — hangs indefinitely on mirror failure). Add retry loop + `timeout-minutes` (chosen — fails fast instead of stalling).
+- **Decision**: (1) Deleted `sourceforgeUpdate()` entirely from `music_deewane_updater_tools.dart`. `getAppUpdates()` now only calls `githubUpdate()`; on failure it returns a structured `results: false` map with current app info (no dialog shown). In-app download/install flow (ADR-042) unchanged — download URL comes straight from the GitHub release assets. (2) `release-linux.yml`: apt step now has `timeout-minutes: 10`, retries `apt-get update` up to 3 times with a 10s sleep between attempts, and installs with `--no-install-recommends`.
+- **Why**: SourceForge data is stale and wrong for this project — GitHub releases are the single source of truth, so a fallback can only produce false positives. The apt hang is environmental; retrying + a hard timeout converts a 30+ minute silent stall into a fast failure that can be re-run.
+- **Consequences**: Update detection is now deterministic: dialog only appears when the GitHub latest release is newer (version or build). If GitHub API fails (e.g. rate limit), no dialog is shown — safe. Linux CI fails fast (≤10 min) when Ubuntu mirrors are unhealthy instead of hanging.
+- **Affects**: `lib/services/music_deewane_updater_tools.dart`, `.github/workflows/release-linux.yml`
 
 ### ADR-044: Updater bug fixes — modulo 1000, emoji, duplicate checks, download URL, Linux, changelog
 - **Date**: 2026-08-19

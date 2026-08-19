@@ -33,9 +33,13 @@ jobs:
           cache: true
 
       - name: Install Linux build dependencies
+        timeout-minutes: 10
         run: |
-          sudo apt-get update
-          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev
+          for i in 1 2 3; do
+            sudo apt-get update && break
+            sleep 10
+          done
+          sudo apt-get install -y --no-install-recommends clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev
 
       - name: Install dependencies
         run: flutter pub get
