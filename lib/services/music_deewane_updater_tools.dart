@@ -267,30 +267,6 @@ Future<Map<String, dynamic>> getAppUpdates() async {
     }
   }
 
-  try {
-    // Contains the latest changelog read by the user. [eg. v2.11.6+171] (can be null)
-    final readChangelogs = await SettingsDAO(DBProvider.db)
-        .getSettingStr(SettingKeys.readChangelogs);
-    final currVer = "v${updates['currVer']}";
-    final currFull = "$currVer+${updates['currBuild']}";
-    final newVer = "v${updates['newVer']}";
-    final newFull = "$newVer+${updates['newBuild']}";
-
-    log('Current version: $currFull, New version: $newFull, Read changelogs: $readChangelogs',
-        name: 'UpdaterTools');
-
-    if (currFull == newFull &&
-        (readChangelogs == null || readChangelogs != currFull)) {
-      final changelogText = await fetchChangelog();
-      updates['changelogs'] = changelogText;
-    } else {
-      updates['changelogs'] = null;
-    }
-  } catch (e, st) {
-    log('Attaching changelog failed: $e\n$st', name: 'UpdaterTools');
-    updates['changelogs'] = null;
-  }
-
   return updates;
 }
 
