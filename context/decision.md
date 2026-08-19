@@ -34,6 +34,7 @@
 ## Decision Index
 
 | ID | Date | Decision | Status | Affects |
+| ADR-046 | 2026-08-19 | Windows CI packaging order fix: Create MSIX moved after Inno installer + ZIP so msix:create's internal rebuild (no --build-number) can't overwrite the correctly-versioned exe | Accepted | release-windows.yml |
 | ADR-045 | 2026-08-19 | Updater GitHub-only: delete SourceForge fallback entirely; Linux CI apt step made resilient (retry + 10-min timeout) | Accepted | music_deewane_updater_tools.dart, release-linux.yml |
 | ADR-044 | 2026-08-19 | Updater bug fixes: modulo 1000 boundary, emoji removal, duplicate checks, hardcoded URL, Linux support, changelog flow | Accepted | music_deewane_updater_tools.dart, global_events_cubit.dart, notification_cubit.dart, 7 locale ARB files |
 | ADR-043 | 2026-08-19 | Plugin ID rebranding — bloomfactory → musicdeewanefactory across manifests + Dart constants | Accepted | Music_Deewane_factory manifests, legacy_media_id_mapper.dart, legacy_migration_service.dart |
@@ -116,6 +117,16 @@
 ## Decision Entries
 
 <!-- Newest decisions go at the top of this section. -->
+
+### ADR-046: Windows CI packaging order — MSIX step moved after ZIP/installer
+- **Date**: 2026-08-19
+- **Status**: Accepted
+- **Context**: The shipped Windows exe in release v1.0.1+59 reported `ProductVersion "1.0.1+1"` (build 1 from pubspec) instead of `1.0.1+59`. The updater compares build numbers, so the app always saw `59 > 1` and showed "Update Available" even on the latest build. A local `flutter build windows --release --build-number 59` produced a correct `1.0.1+59` exe — proving the tool honors `--build-number`. The difference was the CI workflow order: `dart run msix:create` (step 7) internally re-runs `flutter build windows --release` WITHOUT `--build-number`, overwriting the correctly-versioned exe in `build/windows/x64/runner/Release/` with a pubspec-default `1.0.1+1` build. The Inno Setup installer and ZIP steps ran AFTER, packaging the overwritten exe. Android was never affected (gradle applies `--build-number` as versionCode); local builds have no MSIX step.
+- **Options considered**: Pass build number through to msix:create (rejected — msix:create has no `--build-number` pass-through in v3.18; it rebuilds with its own args). Re-run `flutter build windows --build-number` after MSIX (rejected — costs an extra full rebuild). Move the MSIX step after all exe-packaging steps (chosen — zero extra build time, one-step reorder).
+- **Decision**: Reordered `release-windows.yml`: Build Windows → Install Inno Setup → Compile Inno Setup Installer → Package Windows ZIP → Create MSIX → Upload. ZIP and installer now capture the `--build-number`-versioned exe; MSIX (explicit `--version 1.0.1.0`) runs last and its overwrite no longer affects any shipped artifact. Added `New-Item -ItemType Directory -Force windows_artifacts` to the ZIP step (previously the dir was created by the MSIX step running first).
+- **Why**: Root-cause fix — the packaging step was the only thing rewriting the exe. Reordering removes the failure without rework or added CI time.
+- **Consequences**: Next Windows release's exe will report the real build number; updater will correctly detect "up to date". Verification: download the zip from the next CI run and check `ProductVersion`.
+- **Affects**: `.github/workflows/release-windows.yml`
 
 ### ADR-045: Updater GitHub-only — SourceForge fallback removed; Linux CI apt resilience
 - **Date**: 2026-08-19

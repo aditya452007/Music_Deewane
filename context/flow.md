@@ -274,11 +274,11 @@ graph TD
 
     subgraph "Windows Pipeline (Windows)"
         Windows --> W1[Setup Rust, Flutter]
-        W1 --> W2[flutter build windows --release]
-        W2 --> W3[Create MSIX]
-        W3 --> W4[Install Inno Setup]
-        W4 --> W5[Compile Inno Setup Installer]
-        W5 --> W6[Package zip]
+        W1 --> W2[flutter build windows --release --build-number N]
+        W2 --> W3[Install Inno Setup]
+        W3 --> W4[Compile Inno Setup Installer]
+        W4 --> W5[Package zip]
+        W5 --> W6[Create MSIX last — its internal rebuild must not precede exe packaging]
         W6 --> W7[Upload zip + msix + exe to release]
     end
 
