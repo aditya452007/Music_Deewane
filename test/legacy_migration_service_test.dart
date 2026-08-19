@@ -215,8 +215,8 @@ void main() {
       expect(
         roadtripTracks.map((track) => track.mediaId).toList(),
         equals([
-          'content-resolver.bloomfactory.ytmusic::yt-1',
-          'content-resolver.bloomfactory.jisaavn::saavn-1',
+          'content-resolver.musicdeewanefactory.ytmusic::yt-1',
+          'content-resolver.musicdeewanefactory.jisaavn::saavn-1',
         ]),
       );
 
@@ -225,13 +225,13 @@ void main() {
       final likedTracks = await playlistDao.getPlaylistTracks(likedDb!.id);
       expect(
         likedTracks.map((track) => track.mediaId).toList(),
-        equals(['content-resolver.bloomfactory.jisaavn::saavn-1']),
+        equals(['content-resolver.musicdeewanefactory.jisaavn::saavn-1']),
       );
 
       final downloadRow = currentDb
           .collection<DownloadDB>()
           .filter()
-          .mediaIdEqualTo('content-resolver.bloomfactory.ytmusic::yt-1')
+          .mediaIdEqualTo('content-resolver.musicdeewanefactory.ytmusic::yt-1')
           .findFirstSync();
       expect(downloadRow, isNotNull);
       expect(downloadRow!.fileName, 'ytm-song.mp3');
@@ -240,7 +240,7 @@ void main() {
       expect(
         savedArtists.any(
           (artist) =>
-              artist.id == 'content-resolver.bloomfactory.jisaavn::artist-1',
+              artist.id == 'content-resolver.musicdeewanefactory.jisaavn::artist-1',
         ),
         isTrue,
       );
@@ -249,7 +249,7 @@ void main() {
       expect(
         savedAlbums.any(
           (album) =>
-              album.id == 'content-resolver.bloomfactory.ytmusic::album-1',
+              album.id == 'content-resolver.musicdeewanefactory.ytmusic::album-1',
         ),
         isTrue,
       );

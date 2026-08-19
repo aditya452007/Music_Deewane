@@ -42,6 +42,8 @@
 | ADR-037 | 2026-08-18 | Remove onboarding music-language & artist steps, changelog "What's New" screen, and About/developer page; keep only Language+Country onboarding | Accepted | onboarding_overlay.dart, default_artists.dart (deleted), changelog_reader.dart (deleted), about.dart (deleted), global_events_cubit/state, global_event_listener.dart, music_deewane_updater_tools.dart, setting_keys.dart, explore_screen.dart, setting_view.dart |
 | ADR-034 | 2026-08-14 | Sidebar nav items expanded, mini player bleed fixed, player expand mode | Accepted | global_footer.dart, player_overlay_wrapper.dart, player_screen.dart |
 | ADR-035 | 2026-08-14 | Player button layout redesign — scrollable pills, artwork seek zones, action icon row | Accepted | player_screen.dart |
+| ADR-036 | 2026-08-15 | Desktop player uses scrollable pills instead of icon row | Accepted | player_screen.dart |
+| ADR-043 | 2026-08-19 | Plugin ID rebranding — bloomfactory → musicdeewanefactory across manifests + Dart constants | Accepted | Music_Deewane_factory manifests, legacy_media_id_mapper.dart, legacy_migration_service.dart |
 | ADR-033 | 2026-08-14 | UX refinements: single top-artist ForYou section, language/country-based default artists in onboarding, player overlay respects sidebar on desktop, sidebar library header tappable | Accepted | recommendation_cubit.dart, recommendation_state.dart, for_you_section.dart, default_artists.dart (new), onboarding_overlay.dart, player_overlay_wrapper.dart, global_footer.dart |
 | ADR-032 | 2026-08-14 | UX fixes & sidebar redesign: onboarding reorder + skip, Spotify-style collapsible sidebar, For You topic grids, TopPicks fixes, recommendation bug fix, search in discover bar | Accepted | onboarding_overlay.dart, global_footer.dart, for_you_section.dart, top_picks_widget.dart, recommendation_cubit.dart, explore_screen.dart, app_en.arb |
 | ADR-031 | 2026-08-14 | Frontend marketing site rebuild: Spotify-inspired alternating feature rows, split hero with mockup, social proof strip, multi-tier footer with categorized columns, warm teal theme | Accepted | frontend/index.html, frontend/css/style.css, frontend/js/main.js |
@@ -88,6 +90,16 @@
 - **Why**: User requested pill-style buttons on desktop matching mobile design, with better spacing for readability. Download button was creating a blank page due to the Navigator.pop.
 - **Consequences**: Single `_ActionPillsRow` widget for all breakpoints; desktop pills are scrollable when space is tight. OrganicIconButton no longer used in action row (still used in transport controls).
 - **Affects**: `lib/screens/screen/player_screen.dart`
+
+### ADR-043: Plugin ID rebranding — bloomfactory → musicdeewanefactory
+- **Date**: 2026-08-19
+- **Status**: Accepted
+- **Context**: Song info screen displayed `content-resolver.bloomfactory.jisaavn` as the source/plugin ID because the plugin IDs in the manifests and Dart constants still used the original `bloomfactory` naming from the upstream fork. The user's factory is `Music_Deewane_factory`, not `BloomFactory`.
+- **Options considered**: Display-only override in the UI (rejected — doesn't fix underlying IDs); rename plugin IDs everywhere (chosen — consistent branding across manifests, Dart code, and database); keep old IDs and accept stale display (rejected — user explicitly wanted branding fix).
+- **Decision**: (1) All 12 `manifest.json` files in `Music_Deewane_factory` updated: `id` changed from `{type}.bloomfactory.{name}` to `{type}.musicdeewanefactory.{name}`, `publisher.name` changed from `bloomfactory` to `musicdeewanefactory`. (2) GitHub workflow (`bex-factory.yml`): TAG prefix `bloomfactory-v` → `musicdeewanefactory-v`, factory name `BloomFactory (Unofficial + Community)` → `Music Deewane Factory`, release notes updated. (3) Dart constants in `legacy_media_id_mapper.dart` (3 constants) and `legacy_migration_service.dart` (3 constants) updated to match new IDs. (4) Test assertions in `legacy_migration_service_test.dart` (5 strings) updated.
+- **Why**: The plugin IDs are embedded in composite media IDs (e.g., `content-resolver.musicdeewanefactory.jisaavn::song123`). The song info screen parses these IDs to display the source name. Renaming the IDs ensures the info screen shows the correct `musicdeewanefactory` branding.
+- **Consequences**: Breaking change for existing users' saved media IDs. New installs will use `musicdeewanefactory` IDs. Existing users upgrading will need a migration or their old media IDs won't match the new plugin IDs. The `repositories.json` URL was already pointing to `Music_Deewane_factory` so plugin downloads are unaffected.
+- **Affects**: `Music_Deewane_factory/*/manifest.json` (12 files), `Music_Deewane_factory/.github/workflows/bex-factory.yml`, `Music_Deewane/lib/services/db/legacy/legacy_media_id_mapper.dart`, `Music_Deewane/lib/services/db/legacy/legacy_migration_service.dart`, `Music_Deewane/test/legacy_migration_service_test.dart`
 - **Date**: YYYY-MM-DD
 - **Status**: Proposed | Accepted | Rejected | Superseded by ADR-NNN
 - **Context**: [what triggered this decision — the problem being solved]

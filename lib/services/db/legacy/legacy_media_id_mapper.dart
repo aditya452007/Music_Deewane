@@ -1,6 +1,6 @@
-const pluginJisSaavnId = 'content-resolver.bloomfactory.jisaavn';
-const pluginYtMusicId = 'content-resolver.bloomfactory.ytmusic';
-const pluginYtVideoId = 'content-resolver.bloomfactory.ytvideo';
+const pluginJisSaavnId = 'content-resolver.musicdeewanefactory.jisaavn';
+const pluginYtMusicId = 'content-resolver.musicdeewanefactory.ytmusic';
+const pluginYtVideoId = 'content-resolver.musicdeewanefactory.ytvideo';
 
 bool isPluginScopedMediaId(String value) =>
     value.trim().startsWith('content-resolver.');

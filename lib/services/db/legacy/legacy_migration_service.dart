@@ -19,9 +19,9 @@ import 'package:music_deewane/services/db/legacy/legacy_global_db.dart'
 import 'package:isar_community/isar.dart';
 import 'package:path/path.dart' as p;
 
-const _pluginJisSaavn = 'content-resolver.bloomfactory.jisaavn';
-const _pluginYtMusic = 'content-resolver.bloomfactory.ytmusic';
-const _pluginYtVideo = 'content-resolver.bloomfactory.ytvideo';
+const _pluginJisSaavn = 'content-resolver.musicdeewanefactory.jisaavn';
+const _pluginYtMusic = 'content-resolver.musicdeewanefactory.ytmusic';
+const _pluginYtVideo = 'content-resolver.musicdeewanefactory.ytvideo';
 const _migrationStateFileName = 'legacy_migration_state.json';
 const _likedPlaylistName = 'Liked';
 const _skipPlaylistNames = {

@@ -215,6 +215,7 @@ PluginService.execute / install / load / unload          lib/services/plugin/plu
        └─ adapters → bindgen exports → WASM component (wasmi via waclay)
   └─ events → PluginEventBus → PluginBloc / PluginStorageService
 PluginBootstrapService (first-run + 30-min sync): repositories.json → bex-factory.json (Music_Deewane_factory releases) → .bex download → install
+Plugin IDs use `musicdeewanefactory` publisher (ADR-043): {type}.musicdeewanefactory.{name} (e.g. content-resolver.musicdeewanefactory.jisaavn)
 ```
 
 ### Downloads
