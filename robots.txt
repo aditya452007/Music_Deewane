@@ -1,3 +1,7 @@
-# allow crawling everything by default
+# Music Deewane - Robots.txt
+# https://musicdeewane.github.io/Music_Deewane/
+
 User-agent: *
-Disallow:
+Allow: /
+
+Sitemap: https://musicdeewane.github.io/Music_Deewane/sitemap.xml

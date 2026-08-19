@@ -1,44 +1,1040 @@
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<style>
-@import url('https://fonts.googleapis.com/css2?family=Borel&family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=Playwrite+AU+NSW:wght@100..400&display=swap');
-</style>
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Borelfamily=Playwrite+AU+NSW:wght@100..400&display=swap&family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=Exo+2:ital,wght@1,700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-		
-		<link rel="modulepreload" href="/BloomeeTunes/_app/immutable/entry/start.UrNOMoAD.js">
-		<link rel="modulepreload" href="/BloomeeTunes/_app/immutable/chunks/HMDOazaE.js">
-		<link rel="modulepreload" href="/BloomeeTunes/_app/immutable/chunks/CHR7blE8.js">
-		<link rel="modulepreload" href="/BloomeeTunes/_app/immutable/chunks/IWHcZHIB.js">
-		<link rel="modulepreload" href="/BloomeeTunes/_app/immutable/chunks/DiNi6rXo.js">
-		<link rel="modulepreload" href="/BloomeeTunes/_app/immutable/entry/app.mvNFprTH.js">
-		<link rel="modulepreload" href="/BloomeeTunes/_app/immutable/chunks/DsnmJJEf.js">
-		<link rel="modulepreload" href="/BloomeeTunes/_app/immutable/chunks/CykxsI3c.js">
-	</head>
-	<body data-sveltekit-preload-data="hover">
-		<div style="display: contents">
-			<script>
-				{
-					__sveltekit_1aqusvl = {
-						base: "/BloomeeTunes",
-						assets: "/BloomeeTunes"
-					};
+<!DOCTYPE html>
+<html lang="en" style="background-color:#000">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width"/>
+  <title>Music Deewane</title>
+  <link rel="icon" href="assets/logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: #000; color: #fff; font-family: 'Inter', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: inherit; text-decoration: none; }
 
-					const element = document.currentScript.parentElement;
+    /* ===== NAVBAR ===== */
+    .navbar {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      padding: 12px 32px;
+      border-radius: 9999px;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+    }
+    .navbar:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.12);
+    }
+    .navbar.scrolled {
+      top: 8px;
+      padding: 10px 28px;
+      background: rgba(10,10,10,0.85);
+      border-color: rgba(255,255,255,0.06);
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1rem;
+      white-space: nowrap;
+    }
+    .nav-logo img {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      list-style: none;
+    }
+    .nav-links a {
+      padding: 8px 16px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.7);
+      border-radius: 9999px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      color: #fff;
+      background: rgba(255,255,255,0.1);
+    }
+    .nav-cta {
+      padding: 8px 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      background: #0D9488;
+      color: #fff;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .nav-cta:hover { background: #0F766E; transform: scale(1.04); }
 
-					Promise.all([
-						import("/BloomeeTunes/_app/immutable/entry/start.UrNOMoAD.js"),
-						import("/BloomeeTunes/_app/immutable/entry/app.mvNFprTH.js")
-					]).then(([kit, app]) => {
-						kit.start(app, element);
-					});
-				}
-			</script>
-		</div>
-	</body>
+    @media (max-width: 768px) {
+      .navbar { padding: 10px 20px; gap: 16px; width: calc(100% - 32px); }
+      .nav-links { display: none; }
+    }
+
+    /* ===== CONTENT ===== */
+    .main-content { padding-top: 100px; }
+
+    /* Hero */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 80px 24px 48px;
+    }
+    .hero-logo { width: 80px; height: 80px; border-radius: 16px; margin-bottom: 32px; }
+    .hero h1 { font-size: clamp(40px, 8vw, 72px); font-weight: 900; line-height: 1; margin-bottom: 16px; }
+    .hero .tagline {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 24px;
+      max-width: 700px;
+      margin-bottom: 32px;
+    }
+    .hero .divider { width: 100px; height: 4px; background: rgba(255,255,255,0.3); flex-shrink: 0; }
+    .hero .tagline p { color: #a7a7a7; font-size: 1rem; text-align: left; }
+    .hero .tagline a { color: #0D9488; font-weight: 600; }
+    .hero .tagline a:hover { text-decoration: underline; }
+
+    /* GIF Showcase */
+    .gif-showcase { max-width: 1030px; margin: 0 auto; padding: 0 24px; }
+    .gif-showcase img { width: 100%; border-radius: 16px; }
+
+    /* Text Container — Spotify-style: centered, max-width 720px */
+    .text-container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+    .text-container h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      line-height: 1.3;
+      color: #fff;
+    }
+    .text-container p {
+      color: #a7a7a7;
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+
+
+    /* Feature Rows — Spotify-style: no card containers */
+    .feature-row {
+      padding: 24px 32px;
+    }
+    .feature-row-inner {
+      display: flex;
+      flex-direction: row;
+      gap: 32px;
+      align-items: center;
+    }
+    .feature-row-inner img { width: 400px; border-radius: 8px; flex-shrink: 0; }
+    .feature-row-text { flex: 1; }
+    .feature-row-text h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; color: #fff; }
+    .feature-row-text p { color: #a7a7a7; line-height: 1.7; }
+
+    /* Library & NPV Container — groups both sections */
+    .library-npv-container {
+      max-width: 1030px;
+      margin: 0 auto;
+      background: #121212;
+      border-radius: 12px;
+      padding: 8px 0;
+    }
+
+    /* Chips */
+    .chips { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+    .chip {
+      border-radius: 9999px;
+      border: 0;
+      cursor: pointer;
+      padding: 4px 12px;
+      font-size: 0.875rem;
+      font-weight: 700;
+      font-family: inherit;
+      min-height: 32px;
+      display: inline-flex;
+      align-items: center;
+      transition: all 0.2s;
+    }
+    .chip-active { background: #0D9488; color: #000; }
+    .chip-inactive { background: rgba(255,255,255,0.07); color: #fff; }
+    .chip-inactive:hover { background: rgba(255,255,255,0.12); }
+    .chip-description { margin-top: 16px; }
+    .chip-description p { color: #a7a7a7; line-height: 1.7; }
+    .chip-description .bold { color: #fff; font-weight: 700; }
+
+    /* Features Container — Spotify-style: flex with standalone images */
+    .features-container {
+      max-width: 1030px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+    }
+    .feature-card {
+      flex-basis: calc(50% - 12px);
+    }
+    .feature-card img {
+      width: 240px;
+      border-radius: 8px;
+      display: block;
+    }
+    .feature-card-text {
+      margin-top: 8px;
+    }
+    .feature-card-text h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+    .feature-card-text p {
+      font-size: 0.8125rem;
+      color: #a7a7a7;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 768px) {
+      .features-container { flex-direction: column; }
+      .feature-card { flex-basis: 100%; }
+      .feature-card img { width: 100%; }
+    }
+
+    /* Section Header — Spotify-style: large h1, centered */
+    .section-header {
+      max-width: 1030px;
+      margin: 64px auto 32px;
+      padding: 0 24px;
+      text-align: left;
+    }
+    .section-header h1 {
+      font-size: clamp(2.5rem, 5vw, 3rem);
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.1;
+    }
+
+    /* Download Platform Cards */
+    .download-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 20px;
+      max-width: 1030px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .download-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 24px 16px;
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      color: #fff;
+    }
+    .download-card:hover {
+      background: #1a1a1a;
+      border-color: #0D9488;
+      transform: translateY(-2px);
+    }
+    .download-card svg {
+      width: 32px;
+      height: 32px;
+      fill: #a7a7a7;
+      transition: fill 0.2s;
+    }
+    .download-card:hover svg { fill: #0D9488; }
+    .download-card .linux-logo {
+      width: 36px;
+      height: 36px;
+      border: 1.5px solid #444;
+      border-radius: 8px;
+      padding: 4px;
+      fill: #a7a7a7;
+      transition: all 0.2s;
+    }
+    .download-card:hover .linux-logo { fill: #0D9488; border-color: #0D9488; }
+    .download-card span {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #a7a7a7;
+      transition: color 0.2s;
+    }
+    .download-card:hover span { color: #fff; }
+
+    @media (max-width: 768px) {
+      .download-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .download-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* Link */
+    .green-link {
+      color: #0D9488;
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 12px;
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+    .green-link:hover { opacity: 0.8; text-decoration: underline; }
+    .green-link svg { width: 16px; height: 16px; fill: currentColor; }
+
+    /* Mission Section — Spotify-style flex layout */
+    .mission-wrapper {
+      max-width: 1030px;
+      margin: 64px auto 0;
+    }
+    .mission-top {
+      display: flex;
+      gap: 32px;
+      padding: 0 24px 24px;
+      align-items: stretch;
+    }
+    .mission-box {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 16px;
+      background: #1a1a1a;
+      padding: 32px;
+      border: 1px solid #2a2a2a;
+    }
+    .mission-box p {
+      color: #a7a7a7;
+      line-height: 1.7;
+    }
+    .mission-flex {
+      display: flex;
+      gap: 24px;
+      padding: 0 24px;
+    }
+    .mission-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mission-block {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .mission-block img {
+      width: 48px;
+      height: 48px;
+    }
+    .mission-block h1 {
+      font-size: clamp(3rem, 8vw, 4.5rem);
+      font-weight: 900;
+      color: #fff;
+      line-height: 1;
+      padding-top: 16px;
+    }
+    .mission-block p,
+    .mission-block span {
+      color: #a7a7a7;
+      line-height: 1.7;
+    }
+    .mission-block h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .mission-link {
+      color: #1ed760;
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding-top: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .mission-link:hover { opacity: 0.8; text-decoration: underline; }
+    .mission-link svg { width: 16px; height: 16px; fill: currentColor; }
+    .stat-box {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      border-radius: 16px;
+      background: #1a1a1a;
+      padding: 32px;
+      border: 1px solid #2a2a2a;
+      width: 100%;
+    }
+    .stat-box img { width: 48px; height: 48px; flex-shrink: 0; }
+    .stat-box h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      color: #fff;
+      line-height: 1;
+    }
+    .stat-box span {
+      color: #a7a7a7;
+      font-size: 1rem;
+    }
+    .info-block {
+      display: flex;
+      flex-direction: column;
+    }
+    .info-block img { width: 48px; height: 48px; }
+    .info-block p {
+      color: #a7a7a7;
+      line-height: 1.7;
+      padding-top: 8px;
+    }
+    @media (max-width: 768px) {
+      .mission-flex { flex-direction: column; }
+    }
+
+    @media (max-width: 768px) {
+      .feature-row-inner { flex-direction: column; }
+      .feature-row-inner img { width: 100%; }
+    }
+
+    /* Ecosystem Wrapper — groups Connect + Plugin rows */
+    .ecosystem-section {
+      max-width: 1030px;
+      margin: 24px auto 0;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Layout Container — matches feature-row-inner pattern */
+    .layout-container {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+      padding: 24px 32px;
+    }
+    .stat-box .layout-container img {
+      width: 400px;
+      height: auto;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+    .layout-text {
+      flex: 1;
+    }
+    .layout-text h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #fff;
+    }
+    .layout-text p {
+      color: #a7a7a7;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 768px) {
+      .layout-container { flex-direction: column; padding: 24px 16px; }
+      .stat-box .layout-container img { width: 100%; height: auto; }
+    }
+
+    /* Text Block — centered text section */
+    .text-block {
+      max-width: 720px;
+      margin: 64px auto 0;
+      padding: 0 24px;
+      text-align: center;
+    }
+    .text-block h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+    .text-block p {
+      color: #a7a7a7;
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      margin-top: 64px;
+      background: #0a0a0a;
+      padding: 48px 24px 24px;
+    }
+    .footer-outer {
+      max-width: 1100px;
+      margin: 0 auto;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .footer-top {
+      background: #111;
+      border: 1px solid #1a1a1a;
+      border-radius: 16px 16px 0 0;
+      padding: 40px 48px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 32px;
+      justify-content: space-between;
+    }
+    .footer-col h4 {
+      font-size: 0.8125rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+    .footer-col a {
+      display: block;
+      font-size: 0.875rem;
+      color: #a7a7a7;
+      padding: 4px 0;
+      transition: color 0.2s;
+    }
+    .footer-col a:hover { color: #fff; }
+    .footer-social { display: flex; gap: 16px; margin-top: 16px; }
+    .footer-social a {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #a7a7a7;
+      transition: all 0.2s;
+    }
+    .footer-social a:hover { background: rgba(255,255,255,0.12); color: #fff; }
+    .footer-social svg { width: 18px; height: 18px; fill: currentColor; }
+
+    .footer-bottom {
+      background: #111;
+      border: 1px solid #1a1a1a;
+      border-top: none;
+      border-radius: 0 0 16px 16px;
+      padding: 24px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .footer-brand img { width: 32px; height: 32px; border-radius: 6px; }
+    .footer-brand span { font-weight: 700; font-size: 1rem; }
+    .footer-copy { font-size: 0.75rem; color: #64748b; }
+
+    @media (max-width: 768px) {
+      .footer-top { flex-direction: column; gap: 24px; padding: 32px 24px; }
+      .footer-bottom { flex-direction: column; gap: 16px; text-align: center; padding: 24px; }
+    }
+
+    /* ===== MOBILE NAV ===== */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .hamburger span {
+      width: 22px;
+      height: 2px;
+      background: #fff;
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+    @media (max-width: 768px) {
+      .hamburger { display: flex; }
+    }
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.95);
+      backdrop-filter: blur(20px);
+      z-index: 999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+    }
+    .mobile-menu.active { display: flex; }
+    .mobile-menu a {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.7);
+      transition: color 0.2s;
+    }
+    .mobile-menu a:hover { color: #0D9488; }
+    .mobile-close {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 2rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <a href="#" class="nav-logo">
+      <img src="assets/logo.png" alt="Music Deewane"/>
+      <span>Music Deewane</span>
+    </a>
+    <ul class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#download">Download</a>
+      <a href="https://github.com/aditya452007/Music_Deewane" target="_blank">GitHub</a>
+      <a href="https://shodasha.vercel.app/" target="_blank">Shodasha</a>
+    </ul>
+    <button class="nav-cta" onclick="document.getElementById('download').scrollIntoView({behavior:'smooth'})">Download Free</button>
+    <button class="hamburger" id="hamburger" onclick="document.getElementById('mobileMenu').classList.add('active')">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-close" onclick="this.parentElement.classList.remove('active')">&times;</button>
+    <a href="#features" onclick="this.parentElement.classList.remove('active')">Features</a>
+    <a href="#download" onclick="this.parentElement.classList.remove('active')">Download</a>
+    <a href="https://github.com/aditya452007/Music_Deewane" target="_blank">GitHub</a>
+    <a href="https://shodasha.vercel.app/" target="_blank">Shodasha</a>
+  </div>
+
+  <div class="main-content">
+
+    <!-- HERO -->
+    <section class="hero">
+      <img src="assets/logo.png" class="hero-logo" alt="Music Deewane"/>
+      <h1>Your Music, Your Freedom</h1>
+      <div class="tagline">
+        <div class="divider"></div>
+        <p><a href="#download">Music Deewane</a> is a free, open source music player for Windows, Android, and Linux. Stream from YouTube Music, JioSaavn, and more — no ads, no tracking, no limits.</p>
+      </div>
+    </section>
+
+    <!-- GIF 1 -->
+    <div class="gif-showcase">
+      <img src="images/1.png" alt="Music Deewane Demo"/>
+    </div>
+
+    <!-- TEXT CONTAINER -->
+    <div class="text-container">
+      <h2>Your favourite music, all in one place.</h2>
+      <p>Music Deewane gives listeners access to the world's music on a single platform. With smart playlists, synced lyrics, and offline downloads. Import your existing playlists from Spotify, YouTube, and Apple Music with a single click. Your music library, perfectly organized.<br/><br/>A free, open source music player that streams from YouTube Music, JioSaavn, and more. Download, organize, and listen offline — all without ads or tracking.</p>
+    </div>
+
+    <!-- GIF 2 -->
+    <div class="gif-showcase">
+      <img src="images/2.png" alt="Music Deewane Features"/>
+    </div>
+
+    <!-- TEXT CONTAINER -->
+    <div class="text-container">
+      <h2>All new structure, familiar functionality.</h2>
+      <p>Now, listeners can choose how content is displayed in their Library, jump into Search, or dive deeper into what's playing with minimal navigational disruption.<br/><br/>Whether you're listening, discovering, or organizing, our interface seamlessly adjusts to your current mode. Built with a plugin-based architecture, we can extend functionality through community contributions.</p>
+    </div>
+
+    <!-- GIF 3 -->
+    <div class="gif-showcase">
+      <img src="images/3.png" alt="Music Deewane Library"/>
+    </div>
+
+    <!-- SECTION HEADER — Spotify-style: large h1 -->
+    <div class="section-header">
+      <h1>Explore Your Library and the Now Playing View</h1>
+    </div>
+
+    <!-- LIBRARY & NOW PLAYING CONTAINER -->
+    <div class="library-npv-container">
+      <!-- LIBRARY ROW -->
+      <div class="feature-row">
+        <div class="feature-row-inner">
+          <img src="images/4.png" alt="Library"/>
+          <div class="feature-row-text">
+            <h2>Your Library</h2>
+            <div class="chips">
+              <button class="chip chip-active" data-group="library" data-active="true" onclick="switchChip(this, 'library')">Organize</button>
+              <button class="chip chip-inactive" data-group="library" data-active="false" onclick="switchChip(this, 'library')">Customize</button>
+            </div>
+            <div class="chip-description" id="library-desc">
+              <p><span class="bold">Organize, Search & filter Your Library</span><br/>Your Library's new design allows you to toggle through your personalized music, podcast, and audiobook collections without needing to navigate away from your current session. Filter preferences are remembered and listeners can search directly in their library for quick retrieval.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOW PLAYING ROW -->
+      <div class="feature-row" style="margin-top: 24px;">
+        <div class="feature-row-inner">
+          <div class="feature-row-text">
+            <h2>Now Playing View</h2>
+            <div class="chips">
+              <button class="chip chip-active" data-group="npv" data-active="true" onclick="switchChip(this, 'npv')">Go deeper</button>
+              <button class="chip chip-inactive" data-group="npv" data-active="false" onclick="switchChip(this, 'npv')">Lyrics</button>
+              <button class="chip chip-inactive" data-group="npv" data-active="false" onclick="switchChip(this, 'npv')">Queue</button>
+            </div>
+            <div class="chip-description" id="npv-desc">
+              <p>This panel is all about your music. Dive into cover artwork. Save, share, and learn more about the artists, writers, and producers. View synced lyrics in real-time. Manage your queue and upcoming tracks.</p>
+            </div>
+          </div>
+          <img src="images/5.png" alt="Now Playing"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION HEADER — Spotify-style: large h1 -->
+    <div class="section-header">
+      <h1>Other features we love for getting your session started</h1>
+    </div>
+
+    <!-- FEATURES CONTAINER — Spotify-style: cards with image + text -->
+    <div class="features-container" id="features">
+      <div class="feature-card">
+        <img src="images/6.png" alt="Smart Playlists"/>
+        <div class="feature-card-text">
+          <h3>Smart Playlists</h3>
+          <p>Import your existing playlists from Spotify, YouTube, and Apple Music with a single click.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <img src="images/7.png" alt="Synced Lyrics"/>
+        <div class="feature-card-text">
+          <h3>Synced Lyrics</h3>
+          <p>Follow along with lyrics that scroll in time with the music.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <img src="images/8.png" alt="Offline Downloads"/>
+        <div class="feature-card-text">
+          <h3>Offline Downloads</h3>
+          <p>Download tracks with resumable progress and smart retry on failed transfers.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <img src="images/9.png" alt="Plugin System"/>
+        <div class="feature-card-text">
+          <h3>Plugin System</h3>
+          <p>Extend functionality with 12+ community-built content plugins.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="features-container" style="margin-top: 24px;">
+      <div class="feature-card">
+        <img src="images/10.png" alt="100% Free"/>
+        <div class="feature-card-text">
+          <h3>100% Free</h3>
+          <p>No hidden costs, no premium tiers. Everything is free forever.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <img src="images/11.png" alt="No Ads"/>
+        <div class="feature-card-text">
+          <h3>No Ads</h3>
+          <p>Enjoy your music without interruptions. No ads, ever.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <img src="images/12.png" alt="Open Source"/>
+        <div class="feature-card-text">
+          <h3>Open Source</h3>
+          <p>Fully open source. Inspect, modify, and contribute to the codebase.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <img src="images/13.png" alt="No Tracking"/>
+        <div class="feature-card-text">
+          <h3>No Tracking</h3>
+          <p>Your privacy matters. No data collection, no tracking.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION HEADER — Spotify-style: large h1 -->
+    <div class="section-header">
+      <h1>Download Music Deewane</h1>
+    </div>
+
+    <!-- DOWNLOAD PLATFORM CARDS -->
+    <div class="download-grid">
+      <a href="https://github.com/aditya452007/Music_Deewane/releases/latest" target="_blank" class="download-card">
+        <svg viewBox="0 0 24 24"><path d="M6 18c0 .55.45 1 1 1h1v3.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5V19h2v3.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5V19h1c.55 0 1-.45 1-1V8H6v10zM3.5 8C2.67 8 2 8.67 2 9.5v7c0 .83.67 1.5 1.5 1.5S5 17.33 5 16.5v-7C5 8.67 4.33 8 3.5 8zm17 0c-.83 0-1.5.67-1.5 1.5v7c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-7c0-.83-.67-1.5-1.5-1.5zM15.53 2.16l1.3-1.3c.2-.2.2-.51 0-.71-.2-.2-.51-.2-.71 0l-1.48 1.48C13.85 1.23 12.95 1 12 1c-.96 0-1.86.23-2.66.63L7.85.15c-.2-.2-.51-.2-.71 0-.2.2-.2.51 0 .71l1.31 1.31C6.97 3.26 6 5.01 6 7h12c0-1.99-.97-3.75-2.47-4.84zM10 5H9V4h1v1zm5 0h-1V4h1v1z"/></svg>
+        <span>Android</span>
+      </a>
+      <a href="https://github.com/aditya452007/Music_Deewane/releases/latest" target="_blank" class="download-card">
+        <svg viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+        <span>Windows</span>
+      </a>
+      <a href="https://github.com/aditya452007/Music_Deewane/releases/latest" target="_blank" class="download-card">
+        <svg class="linux-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 295"><path fill="currentColor" d="M235.125 249.359c0 17.355-52.617 31.497-117.54 31.497S.044 266.806.044 249.359c0-17.356 52.618-31.498 117.54-31.498c64.924 0 117.45 14.142 117.541 31.498"/><path fill="currentColor" d="M63.213 215.474c-11.387-16.346-13.591-69.606 12.947-102.39C89.292 97.383 92.69 86.455 93.7 71.67c.734-16.805-11.846-66.851 35.537-70.616c48.027-3.857 45.364 43.526 45.088 68.596c-.183 21.12 15.52 33.15 26.355 49.68c19.927 30.303 18.274 82.461-3.765 110.745c-27.916 35.354-51.791 20.018-67.678 21.304c-29.752 1.745-30.762 17.54-66.024-35.905"/><path fill="currentColor" d="M71.027 145.684c6.52-14.785 20.386-40.772 20.662-60.883c0-15.978 47.843-19.835 51.7-3.856c3.856 15.978 13.59 39.853 19.834 51.424c6.245 11.478 24.335 48.118 5.051 80.074c-17.356 28.284-69.973 50.69-98.073-3.856c-9.55-18.917-7.806-42.333.826-62.903"/><path fill="currentColor" d="M156.428 151.285c0 16.162-15.519 37.1-42.15 36.916c-27.456.183-39.118-20.754-39.118-36.916c0-16.161 18.182-29.293 40.588-29.293c22.498.092 40.68 13.132 40.68 29.293"/><path fill="currentColor" d="M141.92 100.504c-.276 16.713-11.204 20.662-24.978 20.662c-13.775 0-23.784-2.48-24.978-20.662c0-11.387 11.203-17.998 24.978-17.998c13.774-.092 24.977 6.52 24.977 17.998"/></svg>
+        <span>Linux</span>
+      </a>
+      <a href="https://github.com/aditya452007/Music_Deewane/releases/latest" target="_blank" class="download-card">
+        <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        <span>macOS</span>
+      </a>
+      <a href="https://github.com/aditya452007/Music_Deewane/releases/latest" target="_blank" class="download-card">
+        <svg viewBox="0 0 24 24"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+        <span>iOS</span>
+      </a>
+    </div>
+
+    <!-- MISSION SECTION — Spotify-style flex layout -->
+    <div class="mission-wrapper">
+      <div class="mission-top">
+        <div class="mission-box" style="flex:1">
+          <p style="color:#fff; font-size:1.5rem; font-weight:700;">Our mission</p>
+          <p>To provide a free, open source music player that respects user privacy and gives everyone access to their favorite music without limits or restrictions.</p>
+        </div>
+        <div class="mission-box">
+          <img src="images/public.svg" alt="" style="width:48px; height:48px; flex-shrink:0;"/>
+          <span>Music Deewane is available in<br/><h1 style="font-size:clamp(3rem,8vw,4.5rem); font-weight:900; color:#fff; line-height:1;">3</h1>platforms, with more coming soon.</span>
+        </div>
+      </div>
+      <div class="mission-flex">
+        <div class="mission-col">
+          <div class="stat-box">
+            <div class="mission-block">
+              <img src="images/artist.svg" alt=""/>
+              <h1>12+</h1>
+              <p>Content plugins available. YouTube Music, JioSaavn, and more through our plugin architecture.<br/>
+              <a href="https://github.com/aditya452007/Music_Deewane" target="_blank" class="mission-link">View on GitHub <svg viewBox="0 0 16 16"><path d='M1 2.75A.75.75 0 0 1 1.75 2H7v1.5H2.5v11h10.219V9h1.5v6.25a.75.75 0 0 1-.75.75H1.75a.75.75 0 0 1-.75-.75V2.75z'/><path d='M15 1v4.993a.75.75 0 1 1-1.5 0V3.56L8.78 8.28a.75.75 0 0 1-1.06-1.06l4.72-4.72h-2.433a.75.75 0 0 1 0-1.5H15z'/></svg></a></p>
+            </div>
+          </div>
+        </div>
+        <div class="mission-col">
+          <div class="stat-box">
+            <img src="images/playlist.svg" alt=""/>
+            <div><h1>100%</h1><span>Free & open source forever.</span></div>
+          </div>
+          <div class="stat-box">
+            <img src="images/podcasts.svg" alt=""/>
+            <div><h1>0</h1><span>Ads, tracking & data collection.</span></div>
+          </div>
+          <div class="stat-box">
+            <img src="images/audiobook.svg" alt=""/>
+            <div><h1>3</h1><span>Platforms supported, more coming soon.</span></div>
+          </div>
+        </div>
+        <div class="mission-col">
+          <div class="stat-box">
+            <div class="info-block">
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="2" y="2" width="18" height="18" rx="3" stroke="#a7a7a7" stroke-width="2"/><rect x="28" y="2" width="18" height="18" rx="3" stroke="#a7a7a7" stroke-width="2"/><rect x="2" y="28" width="18" height="18" rx="3" stroke="#a7a7a7" stroke-width="2"/><rect x="28" y="28" width="18" height="18" rx="3" stroke="#a7a7a7" stroke-width="2"/></svg>
+              <p>Extensible plugin architecture powering 12+ content sources and growing.<br/>
+              <a href="https://github.com/aditya452007/Music_Deewane" target="_blank" class="mission-link">Learn more <svg viewBox="0 0 16 16"><path d='M1 2.75A.75.75 0 0 1 1.75 2H7v1.5H2.5v11h10.219V9h1.5v6.25a.75.75 0 0 1-.75.75H1.75a.75.75 0 0 1-.75-.75V2.75z'/><path d='M15 1v4.993a.75.75 0 1 1-1.5 0V3.56L8.78 8.28a.75.75 0 0 1-1.06-1.06l4.72-4.72h-2.433a.75.75 0 0 1 0-1.5H15z'/></svg></a></p>
+            </div>
+          </div>
+          <div class="stat-box">
+            <div class="info-block">
+              <img src="images/Vector.svg" alt=""/>
+              <p>Our team is focused on inclusive experiences for all, and continue to ensure we are building a product with accessibility at its core.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEXT CONTAINER -->
+    <div class="text-container">
+      <h2>Built by the community, for the community.</h2>
+      <p>Music Deewane is free and open source software. The developer holds no copyright or license restrictions. Free to use, modify, and distribute. Created by <a href="https://shodasha.vercel.app/" style="color:#0D9488;">Shodasha</a>.<br/><br/>No criminal liability attributed to the developer. Your music, your freedom.</p>
+    </div>
+
+    <!-- GIF -->
+    <div class="gif-showcase">
+      <img src="images/16.png" alt="Music Deewane"/>
+    </div>
+
+    <!-- TEXT CONTAINER -->
+    <div class="text-container" id="download">
+      <h2>Try Music Deewane now!</h2>
+      <p>Download for free from <a href="https://github.com/aditya452007/Music_Deewane/releases/latest" style="color:#0D9488;">GitHub Releases</a>. We also have <a href="https://github.com/aditya452007/Music_Deewane" style="color:#0D9488;">source code</a>, if you want to build it yourself.</p>
+      <a href="https://github.com/aditya452007/Music_Deewane/releases/latest" target="_blank" class="green-link" style="margin-top: 16px;">Download Music Deewane <svg viewBox="0 0 16 16"><path d='M1 2.75A.75.75 0 0 1 1.75 2H7v1.5H2.5v11h10.219V9h1.5v6.25a.75.75 0 0 1-.75.75H1.75a.75.75 0 0 1-.75-.75V2.75z'/><path d='M15 1v4.993a.75.75 0 1 1-1.5 0V3.56L8.78 8.28a.75.75 0 0 1-1.06-1.06l4.72-4.72h-2.433a.75.75 0 0 1 0-1.5H15z'/></svg></a>
+    </div>
+
+    <!-- ECOSYSTEM SECTION — Spotify-style: wrapper for image+text rows -->
+    <div class="ecosystem-section">
+      <div class="stat-box">
+        <div class="layout-container">
+          <img src="images/14.png" alt="Cross-Platform"/>
+          <div class="layout-text">
+            <h2>Cross-Platform</h2>
+            <p>Music Deewane runs on Windows, Android, and Linux. iOS and macOS coming soon. Download once, listen everywhere.</p>
+            <a href="#download" class="green-link">Download now <svg viewBox="0 0 16 16"><path d='M1 2.75A.75.75 0 0 1 1.75 2H7v1.5H2.5v11h10.219V9h1.5v6.25a.75.75 0 0 1-.75.75H1.75a.75.75 0 0 1-.75-.75V2.75z'/><path d='M15 1v4.993a.75.75 0 1 1-1.5 0V3.56L8.78 8.28a.75.75 0 0 1-1.06-1.06l4.72-4.72h-2.433a.75.75 0 0 1 0-1.5H15z'/></svg></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-box">
+        <div class="layout-container">
+          <div class="layout-text">
+            <h2>Plugin Ecosystem</h2>
+            <p>Music Deewane supports 12+ content plugins including YouTube Music, JioSaavn, and more. Extend functionality through our community-built plugin system.</p>
+            <a href="https://github.com/aditya452007/Music_Deewane" target="_blank" class="green-link">View plugins <svg viewBox="0 0 16 16"><path d='M1 2.75A.75.75 0 0 1 1.75 2H7v1.5H2.5v11h10.219V9h1.5v6.25a.75.75 0 0 1-.75.75H1.75a.75.75 0 0 1-.75-.75V2.75z'/><path d='M15 1v4.993a.75.75 0 1 1-1.5 0V3.56L8.78 8.28a.75.75 0 0 1-1.06-1.06l4.72-4.72h-2.433a.75.75 0 0 1 0-1.5H15z'/></svg></a>
+          </div>
+          <img src="images/15.png" alt="Plugin Ecosystem"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEXT BLOCK -->
+    <div class="text-block">
+      <h2>Millions of listeners choose free, open source music.</h2>
+      <p>Music Deewane is the perfect companion, fitting into your daily and weekly routines, be it work, study, play or party. And being open source means complete transparency and community-driven development.<br/><br/>Our new structure ensures a cohesive experience across all platforms, while enabling all the functionality and control our listeners have come to expect. This combined with our plugin ecosystem, smart playlists, and focus on privacy, is why listeners choose Music Deewane every day.</p>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-outer">
+      <div class="footer-top">
+        <div class="footer-col">
+          <h4>Product</h4>
+          <a href="#features">Features</a>
+          <a href="#download">Download</a>
+          <a href="https://github.com/aditya452007/Music_Deewane/releases" target="_blank">Releases</a>
+          <a href="https://github.com/aditya452007/Music_Deewane/blob/main/CONTRIBUTING.md" target="_blank">Contributing</a>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <a href="https://github.com/aditya452007/Music_Deewane" target="_blank">GitHub</a>
+          <a href="https://github.com/aditya452007/Music_Deewane/issues" target="_blank">Report Issue</a>
+          <a href="https://github.com/aditya452007/Music_Deewane/blob/main/README.md" target="_blank">Documentation</a>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms & Conditions</a>
+        </div>
+        <div class="footer-col">
+          <h4>Connect</h4>
+          <div class="footer-social">
+            <a href="https://github.com/aditya452007/Music_Deewane" target="_blank" aria-label="GitHub">
+              <svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+            <a href="https://shodasha.vercel.app/" target="_blank" aria-label="Shodasha">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-brand">
+          <img src="assets/logo.png" alt="Music Deewane"/>
+          <span>Music Deewane</span>
+        </div>
+        <span class="footer-copy">&copy; 2026 Music Deewane. Open source under no license restrictions.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // Chip toggle — changes content when clicked
+    const chipData = {
+      library: {
+        active: { title: 'Organize, Search & filter Your Library', desc: "Your Library's new design allows you to toggle through your personalized music, podcast, and audiobook collections without needing to navigate away from your current session. Filter preferences are remembered and listeners can search directly in their library for quick retrieval." },
+        customize: { title: 'Customize Your Library', desc: "Rearrange, rename, and personalize your library view. Choose which sections appear, set custom colors for playlists, and create your perfect music organization system." }
+      },
+      npv: {
+        active: { title: 'Go deeper', desc: "This panel is all about your music. Dive into cover artwork. Save, share, and learn more about the artists, writers, and producers. View synced lyrics in real-time. Manage your queue and upcoming tracks." },
+        lyrics: { title: 'Synced Lyrics', desc: "Follow along with lyrics that scroll in time with the music. Search manually or let the app find them automatically. Perfect for sing-alongs and language learners." },
+        queue: { title: 'Queue Management', desc: "View and reorder your upcoming tracks. Add songs to queue, clear the queue, or save it as a playlist. Full control over what plays next." }
+      }
+    };
+
+    function switchChip(el, group) {
+      const chips = document.querySelectorAll(`.chip[data-group="${group}"]`);
+      chips.forEach(c => {
+        c.classList.remove('chip-active');
+        c.classList.add('chip-inactive');
+        c.dataset.active = 'false';
+      });
+      el.classList.remove('chip-inactive');
+      el.classList.add('chip-active');
+      el.dataset.active = 'true';
+
+      const desc = document.getElementById(`${group}-desc`);
+      const label = el.textContent.trim().toLowerCase().replace(/\s+/g, '');
+      const data = chipData[group];
+
+      if (data) {
+        let key = 'active';
+        if (group === 'library' && label === 'customize') key = 'customize';
+        if (group === 'npv' && label === 'lyrics') key = 'lyrics';
+        if (group === 'npv' && label === 'queue') key = 'queue';
+
+        if (data[key]) {
+          desc.innerHTML = `<p><span class="bold">${data[key].title}</span><br/>${data[key].desc}</p>`;
+        }
+      }
+    }
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const id = a.getAttribute('href');
+        if (id === '#') return;
+        const target = document.querySelector(id);
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+  </script>
+
+</body>
 </html>
