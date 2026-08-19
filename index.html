@@ -118,9 +118,9 @@
     .hero .tagline a { color: #0D9488; font-weight: 600; }
     .hero .tagline a:hover { text-decoration: underline; }
 
-    /* GIF Showcase */
+    /* GIF Showcase — vertical 9:16 images */
     .gif-showcase { max-width: 1030px; margin: 0 auto; padding: 0 24px; display: flex; justify-content: center; }
-    .gif-showcase img { width: 100%; max-width: 680px; border-radius: 16px; object-fit: contain; }
+    .gif-showcase img { width: auto; max-width: 100%; max-height: 480px; border-radius: 16px; object-fit: contain; }
 
     /* Text Container — Spotify-style: centered, max-width 720px */
     .text-container {
@@ -143,7 +143,7 @@
 
 
 
-    /* Feature Rows — Spotify-style: no card containers */
+    /* Feature Rows — vertical 9:16 images */
     .feature-row {
       padding: 24px 32px;
     }
@@ -153,7 +153,7 @@
       gap: 32px;
       align-items: center;
     }
-    .feature-row-inner img { width: 400px; border-radius: 8px; flex-shrink: 0; }
+    .feature-row-inner img { width: auto; max-width: 280px; max-height: 400px; border-radius: 8px; flex-shrink: 0; object-fit: contain; }
     .feature-row-text { flex: 1; }
     .feature-row-text h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; color: #fff; }
     .feature-row-text p { color: #a7a7a7; line-height: 1.7; }
@@ -189,7 +189,7 @@
     .chip-description p { color: #a7a7a7; line-height: 1.7; }
     .chip-description .bold { color: #fff; font-weight: 700; }
 
-    /* Features Container — Spotify-style: flex with standalone images */
+    /* Features Container — vertical 9:16 images */
     .features-container {
       max-width: 1030px;
       margin: 0 auto;
@@ -202,9 +202,12 @@
       flex-basis: calc(50% - 12px);
     }
     .feature-card img {
-      width: 240px;
+      width: auto;
+      max-width: 100%;
+      max-height: 200px;
       border-radius: 8px;
       display: block;
+      object-fit: contain;
     }
     .feature-card-text {
       margin-top: 8px;
@@ -224,7 +227,7 @@
     @media (max-width: 768px) {
       .features-container { flex-direction: column; }
       .feature-card { flex-basis: 100%; }
-      .feature-card img { width: 100%; }
+      .feature-card img { max-height: 240px; }
     }
 
     /* Section Header — Spotify-style: large h1, centered */
@@ -425,7 +428,7 @@
 
     @media (max-width: 768px) {
       .feature-row-inner { flex-direction: column; }
-      .feature-row-inner img { width: 100%; }
+      .feature-row-inner img { max-width: 100%; max-height: 300px; width: auto; }
     }
 
     /* Ecosystem Wrapper — groups Connect + Plugin rows */
@@ -437,7 +440,7 @@
       gap: 24px;
     }
 
-    /* Layout Container — matches feature-row-inner pattern */
+    /* Layout Container — vertical 9:16 images */
     .layout-container {
       display: flex;
       gap: 32px;
@@ -445,10 +448,13 @@
       padding: 24px 32px;
     }
     .stat-box .layout-container img {
-      width: 400px;
+      width: auto;
+      max-width: 280px;
+      max-height: 400px;
       height: auto;
       border-radius: 8px;
       flex-shrink: 0;
+      object-fit: contain;
     }
     .layout-text {
       flex: 1;
@@ -466,7 +472,7 @@
     }
     @media (max-width: 768px) {
       .layout-container { flex-direction: column; padding: 24px 16px; }
-      .stat-box .layout-container img { width: 100%; height: auto; }
+      .stat-box .layout-container img { max-width: 100%; max-height: 300px; width: auto; height: auto; }
     }
 
     /* Text Block — centered text section */
