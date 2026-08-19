@@ -1156,7 +1156,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get updateCheckTitle => '更新の確認';
 
   @override
-  String get updateUpToDate => 'Music Deewane🌸 は最新の状態です！';
+  String get updateUpToDate => 'Music Deewane は最新の状態です！';
 
   @override
   String get updateViewPreRelease => '最新のプレリリースを表示';
@@ -1167,7 +1167,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get updateNewVersionAvailable => 'Music Deewane🌸 の新しいバージョンが利用可能です！';
+  String get updateNewVersionAvailable => 'Music Deewane の新しいバージョンが利用可能です！';
 
   @override
   String updateVersion(String ver, String build) {
@@ -1985,7 +1985,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'Music Deewane🌸 の新しいバージョンが利用可能です！\n\nバージョン: $ver+$build';
+    return 'Music Deewane の新しいバージョンが利用可能です！\n\nバージョン: $ver+$build';
   }
 
   @override

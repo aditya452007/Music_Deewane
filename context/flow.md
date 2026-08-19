@@ -125,7 +125,7 @@ graph TD
 
 ### Flow: Settings, Updates, Shortcuts
 - `SettingsCubit`: 29 keys loaded in parallel, single emit; every setter persists (SettingsDAO string/bool K/V) + emits; EQ (10-band, presets, builtin/device source), crossfade, qualities, backup gate (≤1/day), music languages, favorite artists.
-- Updates: `GlobalEventsCubit.checkForUpdates` → `getAppUpdates()` (GitHub releases API, SourceForge `best_release.json` fallback) → Update dialog → **in-app download** (streaming progress) → platform install (OpenFilex on Android, Process.run on desktop). `NotificationCubit` writes in-app notifications. (Changelog "What's New" screen removed — ADR-037.)
+- Updates: `GlobalEventsCubit.checkForUpdates` → `music_deewane_updater_tools.getAppUpdates()` (GitHub releases API primary, SourceForge `best_release.json` fallback) → `isUpdateAvailable()` (version component-wise + raw build number comparison, no modulo) → `UpdateAvailable` state → `GlobalEventListener` shows update dialog with actual download URL from API response → **in-app download** (streaming progress) → platform install (OpenFilex on Android, Process.run on desktop). `NotificationCubit` only loads persisted notifications (no independent update check). Changelog "What's New" shows only when version AND build match (user is on latest version).
 - Desktop keyboard shortcuts (`KeyboardShortcutsHandler`): media keys, Space, ←/→, ↑/↓, R, S, M, L, T, Alt+←/→ seek (10s, ADR-023), Esc/Backspace (Up Next → player → back).
 
 ---
@@ -298,8 +298,8 @@ graph TD
 | Last.fm auth | `last.fm/api/auth` (browser token flow) | `ScrobbleRepository` |
 | Plugin catalogue | `https://aditya452007.github.io/Music_Deewane/repositories.json` (ghpage branch) → `https://github.com/aditya452007/Music_Deewane_factory/releases/latest/download/bex-factory.json` | `PluginBootstrapService` |
 | Plugin repos | user-added HTTP JSON + `.bex` downloads | `PluginRepositoryService` |
-| Updater | `sourceforge.net/projects/bloomee/best_release.json`, GitHub releases API | `music_deewane_updater_tools` |
-| Download page | `https://bloomee.sourceforge.io/` | Update dialog fallback |
+| Updater | `https://api.github.com/repos/aditya452007/Music_Deewane/releases/latest` (primary), `https://sourceforge.net/projects/music-deewane/best_release.json` (fallback), `https://aditya452007.github.io/Music_Deewane/CHANGELOG.md` | `music_deewane_updater_tools` |
+| Download page | `https://github.com/aditya452007/Music_Deewane/releases` (fallback) | Update dialog |
 | Geo/country | `ipwho.is/`, `api.country.is/`, `ipapi.co/json/`, `ip-api.com/json` | Country allowlist (`CountryInfoService`) |
 | Discord RPC | app id `1339113296405725235` | `DiscordService` (desktop) |
 | Music data | **none in repo** — via WASM plugins' own HTTP | plugins only |

@@ -1169,7 +1169,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get updateNewVersionAvailable => '새로운 버전의 Music Deewane🌸가 출시되었습니다!';
+  String get updateNewVersionAvailable => '새로운 버전의 Music Deewane가 출시되었습니다!';
 
   @override
   String updateVersion(String ver, String build) {
@@ -1988,7 +1988,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return '새로운 버전의 Music Deewane🌸가 출시되었습니다!\n\n버전: $ver+$build';
+    return '새로운 버전의 Music Deewane가 출시되었습니다!\n\n버전: $ver+$build';
   }
 
   @override

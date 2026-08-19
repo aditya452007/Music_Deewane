@@ -384,11 +384,11 @@
   "updateAutoNotify": "Notificar actualizaciones",
   "updateAutoNotifySubtitle": "Avisar al abrir la app si hay una actualización disponible.",
   "updateCheckTitle": "Búsqueda de actualizaciones",
-  "updateUpToDate": "¡Music Deewane🌸 está al día!",
+  "updateUpToDate": "¡Music Deewane está al día!",
   "updateViewPreRelease": "Ver última Pre-Release",
   "updateCurrentVersion": "Versión actual: {curr} + {build}",
   "@updateCurrentVersion": { "placeholders": { "curr": { "type": "String" }, "build": { "type": "String" } } },
-  "updateNewVersionAvailable": "¡Hay una nueva versión de Music Deewane🌸 disponible!",
+  "updateNewVersionAvailable": "¡Hay una nueva versión de Music Deewane disponible!",
   "updateVersion": "Versión: {ver}+{build}",
   "@updateVersion": { "placeholders": { "ver": { "type": "String" }, "build": { "type": "String" } } },
   "updateDownloadNow": "Descargar ahora",
@@ -704,7 +704,7 @@
 
   "snackbarOpeningAlbumPage": "Abriendo página original del álbum.",
 
-  "updateAvailableBody": "¡Nueva versión de Music Deewane🌸 disponible!\n\nVersión: {ver}+{build}",
+  "updateAvailableBody": "¡Nueva versión de Music Deewane disponible!\n\nVersión: {ver}+{build}",
   "@updateAvailableBody": { "placeholders": { "ver": { "type": "String" }, "build": { "type": "String" } } },
 
   "pluginSnackbarInstalled": "Plugin \"{id}\" instalado con éxito",

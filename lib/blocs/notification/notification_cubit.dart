@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:music_deewane/core/models/app_notification.dart';
-import 'package:music_deewane/services/music_deewane_updater_tools.dart';
 import 'package:music_deewane/services/db/dao/notification_dao.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,25 +15,6 @@ class NotificationCubit extends Cubit<NotificationState> {
   NotificationCubit({required NotificationDAO notificationDao})
       : _notificationDao = notificationDao,
         super(NotificationInitial()) {
-    getLatestVersion().then((value) {
-      log("NotificationCubit: results=${value["results"]} currBuild=${value["currBuild"]} newBuild=${value["newBuild"]}",
-          name: 'NotificationCubit');
-      if (value["results"]) {
-        final curr = int.tryParse(value["currBuild"].toString()) ?? 0;
-        final newB = int.tryParse(value["newBuild"].toString()) ?? 0;
-        log("NotificationCubit: curr=$curr new=$newB shouldNotify=${curr < newB}",
-            name: 'NotificationCubit');
-        if (curr < newB) {
-          _notificationDao.putNotification(
-            title: "Update Available",
-            body:
-                "New Version of Music Deewane🌸 is now available!! Version: ${value["newVer"]} + ${value["newBuild"]}",
-            type: "app_update",
-            unique: true,
-          );
-        }
-      }
-    });
     getNotification();
   }
   void getNotification() async {

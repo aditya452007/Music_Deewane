@@ -1234,7 +1234,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get updateCheckTitle => 'Check for Updates';
 
   @override
-  String get updateUpToDate => 'Music Deewane🌸 is up-to-date!!!';
+  String get updateUpToDate => 'Music Deewane is up-to-date!!!';
 
   @override
   String get updateViewPreRelease => 'View Latest Pre-Release';
@@ -1246,7 +1246,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updateNewVersionAvailable =>
-      'New Version of Music Deewane🌸 is now available!!';
+      'New Version of Music Deewane is now available!!';
 
   @override
   String updateVersion(String ver, String build) {
@@ -2104,7 +2104,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'New Version of Music Deewane🌸 is now available!\n\nVersion: $ver+$build';
+    return 'New Version of Music Deewane is now available!\n\nVersion: $ver+$build';
   }
 
   @override

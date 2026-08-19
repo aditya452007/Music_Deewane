@@ -1242,7 +1242,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get updateCheckTitle => 'अपडेट्स चेक करें';
 
   @override
-  String get updateUpToDate => 'Music Deewane🌸 पूरी तरह से अपडेटेड है!';
+  String get updateUpToDate => 'Music Deewane पूरी तरह से अपडेटेड है!';
 
   @override
   String get updateViewPreRelease => 'नया प्री-रिलीज़ वर्शन देखें';
@@ -1254,7 +1254,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get updateNewVersionAvailable =>
-      'Music Deewane🌸 का एक नया वर्शन उपलब्ध है!';
+      'Music Deewane का एक नया वर्शन उपलब्ध है!';
 
   @override
   String updateVersion(String ver, String build) {
@@ -2119,7 +2119,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'Music Deewane🌸 का नया वर्शन आ गया है!\n\nवर्शन: $ver+$build';
+    return 'Music Deewane का नया वर्शन आ गया है!\n\nवर्शन: $ver+$build';
   }
 
   @override

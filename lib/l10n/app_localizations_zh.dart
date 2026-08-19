@@ -1153,7 +1153,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get updateCheckTitle => '检查更新';
 
   @override
-  String get updateUpToDate => 'Music Deewane🌸 已经是最新版本！';
+  String get updateUpToDate => 'Music Deewane 已经是最新版本！';
 
   @override
   String get updateViewPreRelease => '查看最新预发布版';
@@ -1164,7 +1164,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get updateNewVersionAvailable => 'Music Deewane🌸 新版本现已可用！';
+  String get updateNewVersionAvailable => 'Music Deewane 新版本现已可用！';
 
   @override
   String updateVersion(String ver, String build) {
@@ -1981,7 +1981,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'Music Deewane🌸 新版本现已可用！\n\n版本：$ver+$build';
+    return 'Music Deewane 新版本现已可用！\n\n版本：$ver+$build';
   }
 
   @override

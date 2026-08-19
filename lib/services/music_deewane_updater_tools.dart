@@ -46,8 +46,7 @@ bool isUpdateAvailable(
   if (checkBuild && !Platform.isLinux) {
     int parseBuild(String b) {
       try {
-        final parsed = int.parse(b);
-        return parsed > 1000 ? parsed % 1000 : parsed;
+        return int.parse(b);
       } catch (_) {
         final m = RegExp(r'(\d+)').firstMatch(b);
         return m != null ? int.parse(m.group(1)!) : 0;
@@ -166,9 +165,7 @@ Future<Map<String, dynamic>> sourceforgeUpdate(
         'newBuild': build,
         'download_url': releaseUrl,
         'currVer': packageInfo.version,
-        'currBuild': (int.tryParse(packageInfo.buildNumber) ?? 0) > 1000
-            ? ((int.tryParse(packageInfo.buildNumber) ?? 0) % 1000).toString()
-            : packageInfo.buildNumber,
+        'currBuild': packageInfo.buildNumber,
         'results': isUpdateAvailable(
           packageInfo.version,
           packageInfo.buildNumber,
@@ -219,9 +216,7 @@ Future<Map<String, dynamic>> githubUpdate(
         'newBuild': buildPart,
         'download_url': download,
         'currVer': packageInfo.version,
-        'currBuild': (int.tryParse(packageInfo.buildNumber) ?? 0) > 1000
-            ? ((int.tryParse(packageInfo.buildNumber) ?? 0) % 1000).toString()
-            : packageInfo.buildNumber,
+        'currBuild': packageInfo.buildNumber,
         'results': isUpdateAvailable(
           packageInfo.version,
           packageInfo.buildNumber,
@@ -272,6 +267,30 @@ Future<Map<String, dynamic>> getAppUpdates() async {
     }
   }
 
+  try {
+    // Contains the latest changelog read by the user. [eg. v2.11.6+171] (can be null)
+    final readChangelogs = await SettingsDAO(DBProvider.db)
+        .getSettingStr(SettingKeys.readChangelogs);
+    final currVer = "v${updates['currVer']}";
+    final currFull = "$currVer+${updates['currBuild']}";
+    final newVer = "v${updates['newVer']}";
+    final newFull = "$newVer+${updates['newBuild']}";
+
+    log('Current version: $currFull, New version: $newFull, Read changelogs: $readChangelogs',
+        name: 'UpdaterTools');
+
+    if (currFull == newFull &&
+        (readChangelogs == null || readChangelogs != currFull)) {
+      final changelogText = await fetchChangelog();
+      updates['changelogs'] = changelogText;
+    } else {
+      updates['changelogs'] = null;
+    }
+  } catch (e, st) {
+    log('Attaching changelog failed: $e\n$st', name: 'UpdaterTools');
+    updates['changelogs'] = null;
+  }
+
   return updates;
 }
 
@@ -279,20 +298,14 @@ Future<Map<String, dynamic>> getAppUpdates() async {
 Future<Map<String, dynamic>> getLatestVersion() async => await getAppUpdates();
 
 String? extractUpUrl(Map<String, dynamic> data) {
-  // List<String> urls = [];
-
   for (var element in (data["assets"] as List)) {
-    // urls.add(element["browser_download_url"]);
-    if (element["browser_download_url"].toString().contains("windows")) {
-      if (Platform.isWindows) {
-        return element["browser_download_url"].toString();
-      }
-    } else if (element["browser_download_url"].toString().contains("android")) {
-      if (Platform.isAndroid) {
-        return element["browser_download_url"].toString();
-      }
-    } else {
-      continue;
+    final url = element["browser_download_url"].toString();
+    if (url.contains("windows") && Platform.isWindows) {
+      return url;
+    } else if (url.contains("android") && Platform.isAndroid) {
+      return url;
+    } else if (url.contains("linux") && Platform.isLinux) {
+      return url;
     }
   }
   return null;
