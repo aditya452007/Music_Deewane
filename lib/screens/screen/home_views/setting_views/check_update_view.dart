@@ -44,7 +44,7 @@ class CheckUpdateView extends StatelessWidget {
                       child: FilledButton(
                         onPressed: () {
                           launchUrl2(Uri.parse(
-                              "https://github.com/aditya452007/Music_Deewane/releases"));
+                              "https://github.com/aditya452007/Music_Deewane/releases/latest"));
                         },
                         child: SizedBox(
                           child: Row(
@@ -114,7 +114,7 @@ class CheckUpdateView extends StatelessWidget {
                       child: FilledButton(
                         onPressed: () {
                           launchUrl2(Uri.parse(
-                              "https://github.com/aditya452007/Music_Deewane/releases"));
+                              "https://github.com/aditya452007/Music_Deewane/releases/latest"));
                         },
                         child: SizedBox(
                           width: 150,

@@ -35,6 +35,7 @@
 
 | ID | Date | Decision | Status | Affects |
 | ADR-048 | 2026-08-20 | Explore screen section filtering: exclude browse_discover, radio, trending sections + empty sections from plugin results | Accepted | explore_screen.dart |
+| ADR-049 | 2026-08-20 | CI/CD unified release workflow: merge 3 platform workflows into 1 to fix race condition; update button opens releases/latest and disappears after click | Accepted | release.yml (new), release-windows.yml (deleted), release-android.yml (deleted), release-linux.yml (deleted), check_update_view.dart, global_event_listener.dart |
 | ADR-047 | 2026-08-20 | Updater false positive fix: remove build number comparison (semantic version only), redirect update button to GitHub releases page, CI writes version.json artifact | Accepted | music_deewane_updater_tools.dart, check_update_view.dart, global_event_listener.dart, release-windows.yml, release-android.yml, release-linux.yml |
 | ADR-046 | 2026-08-19 | Windows CI packaging order fix: Create MSIX moved after Inno installer + ZIP so msix:create's internal rebuild (no --build-number) can't overwrite the correctly-versioned exe | Accepted | release-windows.yml |
 | ADR-045 | 2026-08-19 | Updater GitHub-only: delete SourceForge fallback entirely; Linux CI apt step made resilient (retry + 10-min timeout) | Accepted | music_deewane_updater_tools.dart, release-linux.yml |
@@ -119,6 +120,16 @@
 ## Decision Entries
 
 <!-- Newest decisions go at the top of this section. -->
+
+### ADR-049: CI/CD unified release workflow + update button UX fix
+- **Date**: 2026-08-20
+- **Status**: Accepted
+- **Context**: Three separate release workflows (`release-windows.yml`, `release-android.yml`, `release-linux.yml`) all triggered on push to main and raced to create/update the same GitHub release. Even with `replacesArtifacts: true`, the concurrent `ncipollo/release-action` calls caused artifact loss — releases 61-63 only had Windows artifacts despite all 3 workflows completing successfully. Additionally, the update button opened `/releases` (all releases list) instead of `/releases/latest`, and the dialog didn't dismiss after clicking.
+- **Options considered**: Keep 3 workflows with serialized triggers (rejected — complex, fragile); use matrix strategy (rejected — Windows needs different runner); merge into single workflow with sequential build jobs + final release job (chosen — eliminates race entirely); fix only update URL (incomplete — dialog still doesn't dismiss).
+- **Decision**: (1) Deleted `release-windows.yml`, `release-android.yml`, `release-linux.yml`. Created single `release.yml` with 4 jobs: `build-windows` (windows-latest), `build-android` (ubuntu-latest), `build-linux` (ubuntu-latest) — all run in parallel; `release` job with `needs: [build-windows, build-android, build-linux]` downloads all artifacts, flattens them, creates ONE GitHub release with all assets. (2) Update dialog in `global_event_listener.dart`: URL changed to `releases/latest`, `Navigator.of(context).pop()` before `openURL()` (dialog disappears). (3) Update buttons in `check_update_view.dart`: both URLs changed to `releases/latest`.
+- **Why**: The race condition was unfixable with `replacesArtifacts` alone — `ncipollo/release-action` doesn't handle concurrent updates atomically. A single workflow with `needs:` dependency ensures one release is created after all builds complete. `/releases/latest` always points to the most recent release regardless of tag.
+- **Consequences**: Single workflow file instead of 3. Release job adds ~1 minute (downloading artifacts). All platform artifacts guaranteed on every release. Update button now works correctly. Old workflow files deleted.
+- **Affects**: `.github/workflows/release.yml` (new), `.github/workflows/release-windows.yml` (deleted), `.github/workflows/release-android.yml` (deleted), `.github/workflows/release-linux.yml` (deleted), `lib/screens/screen/home_views/setting_views/check_update_view.dart`, `lib/screens/widgets/global_event_listener.dart`
 
 ### ADR-048: Explore screen section filtering — remove empty/unwanted plugin sections
 - **Date**: 2026-08-20
