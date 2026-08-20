@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./assets/docs/bloomeetunes_new_banner.png" alt="Music Deewane Banner" width="100%">
+<img src="./assets/logo.png" alt="Music Deewane Banner" width="100%">
 
 # 🎵 Music Deewane
 
@@ -18,13 +18,13 @@
 
 <div align="center">
   <p float="left">
-    <img src="./assets/docs/playlistview.png" width="48%" />
-    <img src="./assets/docs/artistview.png" width="48%" />
+    <img src="./images/5.png" width="48%" />
+    <img src="./images/6.png" width="48%" />
   </p>
   <p float="left">
-    <img src="./assets/docs/playerview.png" width="48%" />
-    <img src="./assets/docs/lyricsview1.png" width="48%" />
-<img src="./assets/docs/banner2BloomeScrnShot.png" width="90%"/>
+    <img src="./images/3.png" width="48%" />
+    <img src="./images/4.png" width="48%" />
+<img src="./images/1.png" width="90%"/>
   </p>
 </div>
 
