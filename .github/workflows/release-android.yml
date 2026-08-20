@@ -115,5 +115,5 @@ jobs:
           artifacts: music_deewane_android_v*.apk music_deewane_android_v*_version.json
           token: ${{ github.token }}
           allowUpdates: true
-          replacesArtifacts: false
+          replacesArtifacts: true
           makeLatest: legacy

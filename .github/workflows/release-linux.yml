@@ -96,5 +96,5 @@ jobs:
           artifacts: music_deewane_linux_*.tar.gz music_deewane_linux_*_version.json
           token: ${{ github.token }}
           allowUpdates: true
-          replacesArtifacts: false
+          replacesArtifacts: true
           makeLatest: legacy

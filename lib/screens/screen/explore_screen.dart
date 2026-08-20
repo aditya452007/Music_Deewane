@@ -19,7 +19,6 @@ import 'package:music_deewane/screens/widgets/more_bottom_sheet.dart';
 import 'package:music_deewane/screens/widgets/sign_board_widget.dart';
 import 'package:music_deewane/screens/widgets/song_tile.dart';
 import 'package:music_deewane/screens/widgets/top_picks_widget.dart';
-import 'package:music_deewane/screens/widgets/for_you_section.dart';
 import 'package:flutter/material.dart';
 import 'package:music_deewane/screens/screen/home_views/notification_view.dart';
 import 'package:music_deewane/screens/screen/home_views/setting_view.dart';
@@ -184,7 +183,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   delegate: SliverChildListDelegate(
                     [
                       const TopPicksWidget(),
-                      const ForYouSection(),
                       BlocBuilder<SettingsCubit, SettingsState>(
                         builder: (context, state) {
                           if (state.lFMPicks) {
@@ -365,13 +363,20 @@ class _HomeSectionsList extends StatelessWidget {
   static const _excludedSectionIds = {
     'browse_discover', // Browse Categories (empty)
     'radio', // Radio Station
-    'trending', // YTVideo Trending (keep JioSaavn's 'new_trending')
   };
+
+  static final _excludedTitles = RegExp(
+    'trending', // Any "Trending" section from any plugin
+    caseSensitive: false,
+  );
 
   @override
   Widget build(BuildContext context) {
     final filtered = sections
-        .where((s) => !_excludedSectionIds.contains(s.id) && s.items.isNotEmpty)
+        .where((s) =>
+            !_excludedSectionIds.contains(s.id) &&
+            !_excludedTitles.hasMatch(s.title) &&
+            s.items.isNotEmpty)
         .toList();
     return ListView.builder(
       shrinkWrap: true,

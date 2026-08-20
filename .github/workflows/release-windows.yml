@@ -107,5 +107,5 @@ jobs:
             windows_artifacts/MusicDeewaneSetup_*.exe
           token: ${{ github.token }}
           allowUpdates: true
-          replacesArtifacts: false
+          replacesArtifacts: true
           makeLatest: legacy
