@@ -58,7 +58,7 @@ graph TD
 - `QuickAccessChips` ← `LibraryItemsCubit` → horizontal scrollable pill row of user playlists (pinned first, then unpinned); tap → `context.pushNamed(RoutePaths.playlistView, extra: storageKey)`.
 - `TopPicksWidget` ← `RecentlyCubit` → paginated grid (3×3 mobile, 5×4 desktop) via `PageView` + `GridView.count`; tap → `player.loadPlaylist(...)`; long press → `showMoreBottomSheet`; refresh button re-shuffles.
 - `ForYouSection` (ADR-030, ADR-032) ← `RecommendationCubit` → tracks grouped by artist reason → each group: "Because you listened to [Artist]" header + paginated grid (3×3 mobile, 5×4 desktop) via `PageView` + `GridView.count`; tap → `player.loadPlaylist(...)`; long press → `showMoreBottomSheet`; refresh button recomputes scores.
-- `ExploreScreen` → `ContentBloc.getHomeSections` → `PluginService.execute` → Rust `PluginManager` → active **content resolver** plugin `getHomeSections` → `HomeSections` → section cards; `LoadMoreHomeSectionItems` (pageToken) for infinite scroll.
+- `ExploreScreen` → `ContentBloc.getHomeSections` → `PluginService.execute` → Rust `PluginManager` → active **content resolver** plugin `getHomeSections` → `HomeSections` → section cards (filtered: `browse_discover`, `radio`, `trending` excluded; empty sections excluded) → `LoadMoreHomeSectionItems` (pageToken) for infinite scroll.
 - Recents: `RecentlyCubit` ← `HistoryDAO.watchHistory`; full history view via `HistoryView` (accessible from settings/notifications area).
 
 ### Flow: Search

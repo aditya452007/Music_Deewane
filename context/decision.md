@@ -34,6 +34,7 @@
 ## Decision Index
 
 | ID | Date | Decision | Status | Affects |
+| ADR-048 | 2026-08-20 | Explore screen section filtering: exclude browse_discover, radio, trending sections + empty sections from plugin results | Accepted | explore_screen.dart |
 | ADR-047 | 2026-08-20 | Updater false positive fix: remove build number comparison (semantic version only), redirect update button to GitHub releases page, CI writes version.json artifact | Accepted | music_deewane_updater_tools.dart, check_update_view.dart, global_event_listener.dart, release-windows.yml, release-android.yml, release-linux.yml |
 | ADR-046 | 2026-08-19 | Windows CI packaging order fix: Create MSIX moved after Inno installer + ZIP so msix:create's internal rebuild (no --build-number) can't overwrite the correctly-versioned exe | Accepted | release-windows.yml |
 | ADR-045 | 2026-08-19 | Updater GitHub-only: delete SourceForge fallback entirely; Linux CI apt step made resilient (retry + 10-min timeout) | Accepted | music_deewane_updater_tools.dart, release-linux.yml |
@@ -118,6 +119,16 @@
 ## Decision Entries
 
 <!-- Newest decisions go at the top of this section. -->
+
+### ADR-048: Explore screen section filtering — remove empty/unwanted plugin sections
+- **Date**: 2026-08-20
+- **Status**: Accepted
+- **Context**: The Explore screen showed several empty or unwanted plugin-provided sections: Browse Categories (empty from JioSaavn), Radio Station (from JioSaavn), and a duplicate Trending section (from YTVideo alongside JioSaavn's Trending Now). User requested removal of these sections to clean up the home screen.
+- **Options considered**: Modify Rust plugins to stop returning these sections (rejected — requires rebuilding WASM plugins, affects all users); filter sections in Dart before rendering (chosen — simple, no plugin changes needed); add a settings toggle for section visibility (rejected — YAGNI for current need).
+- **Decision**: Added `_excludedSectionIds` set to `_HomeSectionsList` widget in `explore_screen.dart` containing `browse_discover`, `radio`, and `trending` IDs. Also filters out any section with empty items. JioSaavn's `new_trending` (Trending Now) is preserved.
+- **Why**: Simplest fix — filter at the UI layer without touching plugin code. Section IDs are stable (hardcoded in Rust plugins). Empty section filter prevents future empty sections from appearing.
+- **Consequences**: Three plugin sections hidden from the Explore screen. If plugins change their section IDs, the filter must be updated. No impact on plugin functionality — sections are still fetched, just not rendered.
+- **Affects**: `lib/screens/screen/explore_screen.dart`
 
 ### ADR-047: Updater false positive fix — semantic version only, GitHub releases redirect
 - **Date**: 2026-08-20

@@ -362,16 +362,25 @@ class _HomeSectionsList extends StatelessWidget {
     required this.state,
   });
 
+  static const _excludedSectionIds = {
+    'browse_discover', // Browse Categories (empty)
+    'radio', // Radio Station
+    'trending', // YTVideo Trending (keep JioSaavn's 'new_trending')
+  };
+
   @override
   Widget build(BuildContext context) {
+    final filtered = sections
+        .where((s) => !_excludedSectionIds.contains(s.id) && s.items.isNotEmpty)
+        .toList();
     return ListView.builder(
       shrinkWrap: true,
       itemExtent: 275,
       padding: const EdgeInsets.only(top: 0),
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: sections.length,
+      itemCount: filtered.length,
       itemBuilder: (context, index) {
-        final section = sections[index];
+        final section = filtered[index];
         return HorizontalCardView(
           section: section,
           pluginId: contentBloc.state.activePluginId ?? '',
