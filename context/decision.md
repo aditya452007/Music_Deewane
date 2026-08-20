@@ -34,6 +34,7 @@
 ## Decision Index
 
 | ID | Date | Decision | Status | Affects |
+| ADR-047 | 2026-08-20 | Updater false positive fix: remove build number comparison (semantic version only), redirect update button to GitHub releases page, CI writes version.json artifact | Accepted | music_deewane_updater_tools.dart, check_update_view.dart, global_event_listener.dart, release-windows.yml, release-android.yml, release-linux.yml |
 | ADR-046 | 2026-08-19 | Windows CI packaging order fix: Create MSIX moved after Inno installer + ZIP so msix:create's internal rebuild (no --build-number) can't overwrite the correctly-versioned exe | Accepted | release-windows.yml |
 | ADR-045 | 2026-08-19 | Updater GitHub-only: delete SourceForge fallback entirely; Linux CI apt step made resilient (retry + 10-min timeout) | Accepted | music_deewane_updater_tools.dart, release-linux.yml |
 | ADR-044 | 2026-08-19 | Updater bug fixes: modulo 1000 boundary, emoji removal, duplicate checks, hardcoded URL, Linux support, changelog flow | Accepted | music_deewane_updater_tools.dart, global_events_cubit.dart, notification_cubit.dart, 7 locale ARB files |
@@ -117,6 +118,16 @@
 ## Decision Entries
 
 <!-- Newest decisions go at the top of this section. -->
+
+### ADR-047: Updater false positive fix — semantic version only, GitHub releases redirect
+- **Date**: 2026-08-20
+- **Status**: Accepted
+- **Context**: The updater ALWAYS showed "Update Available" even on the latest release. Root cause: `isUpdateAvailable` compared build numbers, but the binary's build number comes from `pubspec.yaml` (always `1` unless manually bumped), while CI release tags use `github.run_number` (59+). There is no way to embed `github.run_number` into the binary — `flutter build --build-number` sets platform-specific versionCode but `PackageInfo.buildNumber` reads from pubspec.yaml. The comparison `59 > 1` always returns true. Additionally, the in-app download flow (ADR-042) was unreliable — `UpdateService` used `open_filex` for Android and `Process.run` for desktop, but download URLs from GitHub assets often failed or were platform-specific.
+- **Options considered**: Embed `github.run_number` via `--dart-define` (rejected — `PackageInfo` doesn't read dart-defines; would require custom platform channel code). Bump pubspec build number in CI before build (rejected — modifies tracked file, creates git noise, run_number still differs per-platform). Remove build number comparison entirely, compare semantic versions only (chosen — simple, correct, no false positives). Keep in-app download (rejected — unreliable cross-platform, user explicitly wants GitHub releases page).
+- **Decision**: (1) Removed build number comparison from `isUpdateAvailable` — now only compares semantic versions (major.minor.patch). Same version = no update, regardless of build number. Removed `checkBuild` parameter and `Platform.isLinux` exclusion. (2) Update dialog in `GlobalEventListener` now calls `openURL("https://github.com/aditya452007/Music_Deewane/releases")` instead of `UpdateService().showDownloadDialog()`. (3) Settings → Check for Updates "Update Now" button also redirects to GitHub releases page. (4) Removed `UpdateService` import from both files. (5) CI pipelines (Windows, Android, Linux) now write `version.json` artifact containing version, build, tag, commit, and platform info for verification.
+- **Why**: Build number comparison is fundamentally broken for this CI setup — the binary and GitHub tags will never match. Semantic version comparison is the correct approach: it detects genuine version upgrades (1.0.1 → 1.0.2) without false positives from build number mismatches. Redirecting to GitHub releases is simpler, more reliable, and lets users choose their platform artifact.
+- **Consequences**: Update button only appears when a genuinely newer version exists (e.g., 1.0.2 when user has 1.0.1). No more false "Update Available" on the latest release. Users are redirected to GitHub releases where they can download the correct artifact for their platform. `UpdateService` is no longer used (can be deleted later). CI version.json provides traceability.
+- **Affects**: `lib/services/music_deewane_updater_tools.dart`, `lib/screens/screen/home_views/setting_views/check_update_view.dart`, `lib/screens/widgets/global_event_listener.dart`, `.github/workflows/release-windows.yml`, `.github/workflows/release-android.yml`, `.github/workflows/release-linux.yml`
 
 ### ADR-046: Windows CI packaging order — MSIX step moved after ZIP/installer
 - **Date**: 2026-08-19

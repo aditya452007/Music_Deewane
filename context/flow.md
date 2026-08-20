@@ -125,7 +125,7 @@ graph TD
 
 ### Flow: Settings, Updates, Shortcuts
 - `SettingsCubit`: 29 keys loaded in parallel, single emit; every setter persists (SettingsDAO string/bool K/V) + emits; EQ (10-band, presets, builtin/device source), crossfade, qualities, backup gate (≤1/day), music languages, favorite artists.
-- Updates: `GlobalEventsCubit.checkForUpdates` → `music_deewane_updater_tools.getAppUpdates()` → GitHub releases API only (SourceForge fallback removed — ADR-045) → `isUpdateAvailable()` (version component-wise + raw build number comparison, no modulo) → `UpdateAvailable` state → `GlobalEventListener` shows update dialog with actual download URL from the GitHub release assets → **in-app download** (streaming progress) → platform install (OpenFilex on Android, Process.run on desktop). `NotificationCubit` only loads persisted notifications (no independent update check). Changelog "What's New" shows only when version AND build match (user is on latest version).
+- Updates: `GlobalEventsCubit.checkForUpdates` → `music_deewane_updater_tools.getAppUpdates()` → GitHub releases API only (SourceForge fallback removed — ADR-045) → `isUpdateAvailable()` (semantic version comparison only — build numbers removed, ADR-047) → `UpdateAvailable` state → `GlobalEventListener` shows update dialog → "Update Now" opens GitHub releases page in browser (in-app download removed — ADR-047). `NotificationCubit` only loads persisted notifications (no independent update check). Update button in Settings → Check for Updates also redirects to GitHub releases page.
 - Desktop keyboard shortcuts (`KeyboardShortcutsHandler`): media keys, Space, ←/→, ↑/↓, R, S, M, L, T, Alt+←/→ seek (10s, ADR-023), Esc/Backspace (Up Next → player → back).
 
 ---
