@@ -5,9 +5,11 @@ import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
 
 bool isUpdateAvailable(
-    String currentVer, String currentBuild, String newVer, String newBuild,
-    {bool checkBuild = true}) {
-  // Normalize versions and builds and compare component-wise.
+    String currentVer, String currentBuild, String newVer, String newBuild) {
+  // Compare semantic versions only. Build numbers are NOT compared because:
+  // - The binary's build number comes from pubspec.yaml (always 1 unless bumped)
+  // - CI release tags use github.run_number (59+), which can never match pubspec
+  // - Comparing them causes false "update available" on the latest release
   List<int> parseVersion(String v) {
     v = v.replaceFirst(RegExp(r'^v'), '');
     final parts = v.split('.');
@@ -20,7 +22,7 @@ bool isUpdateAvailable(
   List<int> currentParts = parseVersion(currentVer);
   List<int> newParts = parseVersion(newVer);
 
-  log('isUpdateAvailable: currentVer="$currentVer" currentBuild="$currentBuild" newVer="$newVer" newBuild="$newBuild" checkBuild=$checkBuild',
+  log('isUpdateAvailable: currentVer="$currentVer" newVer="$newVer"',
       name: 'UpdaterTools');
   log('isUpdateAvailable: currentParts=$currentParts newParts=$newParts',
       name: 'UpdaterTools');
@@ -32,44 +34,18 @@ bool isUpdateAvailable(
     final cur = i < currentParts.length ? currentParts[i] : 0;
     final neu = i < newParts.length ? newParts[i] : 0;
     if (neu > cur) {
-      log('isUpdateAvailable: version[${neu > cur}] $neu > $cur → true',
+      log('isUpdateAvailable: version $neu > $cur → true',
           name: 'UpdaterTools');
       return true;
     }
     if (neu < cur) {
-      log('isUpdateAvailable: version[${neu < cur}] $neu < $cur → false',
+      log('isUpdateAvailable: version $neu < $cur → false',
           name: 'UpdaterTools');
       return false;
     }
   }
 
-  if (checkBuild && !Platform.isLinux) {
-    int parseBuild(String b) {
-      try {
-        return int.parse(b);
-      } catch (_) {
-        final m = RegExp(r'(\d+)').firstMatch(b);
-        return m != null ? int.parse(m.group(1)!) : 0;
-      }
-    }
-
-    final curBuild = parseBuild(currentBuild);
-    final newBuildNum = parseBuild(newBuild);
-    log('isUpdateAvailable: curBuild=$curBuild newBuildNum=$newBuildNum',
-        name: 'UpdaterTools');
-    if (newBuildNum > curBuild) {
-      log('isUpdateAvailable: build $newBuildNum > $curBuild → true',
-          name: 'UpdaterTools');
-      return true;
-    }
-    if (newBuildNum < curBuild) {
-      log('isUpdateAvailable: build $newBuildNum < $curBuild → false',
-          name: 'UpdaterTools');
-      return false;
-    }
-  }
-
-  log('isUpdateAvailable: no update found → false', name: 'UpdaterTools');
+  log('isUpdateAvailable: same version → false', name: 'UpdaterTools');
   return false;
 }
 
@@ -112,7 +88,6 @@ Future<Map<String, dynamic>> githubUpdate(
           packageInfo.buildNumber,
           versionPart.isNotEmpty ? versionPart : '0.0.0',
           buildPart.isNotEmpty ? buildPart : '0',
-          checkBuild: true,
         ),
       };
     } else {

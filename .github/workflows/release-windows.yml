@@ -62,6 +62,14 @@ jobs:
           $v = "${{ steps.version.outputs.V_TAG }}"
           $releaseDir = "build/windows/x64/runner/Release"
           New-Item -ItemType Directory -Force -Path windows_artifacts | Out-Null
+          # Write version info for updater verification
+          @{
+            version = "${{ steps.version.outputs.VERSION }}"
+            build = "${{ github.run_number }}"
+            tag = "v${{ steps.version.outputs.V_TAG }}"
+            commit = "${{ github.sha }}"
+            platform = "windows"
+          } | ConvertTo-Json | Set-Content -Path "$releaseDir/version.json"
           Compress-Archive -Path "$releaseDir/*" -DestinationPath "windows_artifacts/music_deewane_windows_v${v}.zip"
 
       - name: Create MSIX

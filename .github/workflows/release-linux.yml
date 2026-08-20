@@ -56,7 +56,18 @@ jobs:
         run: flutter build linux --release --build-number ${{ github.run_number }}
 
       - name: Package Linux build
-        run: tar -czf "music_deewane_linux_x64_v${{ steps.version.outputs.V_TAG }}.tar.gz" -C build/linux/x64/release/bundle .
+        run: |
+          tar -czf "music_deewane_linux_x64_v${{ steps.version.outputs.V_TAG }}.tar.gz" -C build/linux/x64/release/bundle .
+          # Write version info for updater verification
+          cat > "music_deewane_linux_x64_v${{ steps.version.outputs.V_TAG }}_version.json" << EOF
+          {
+            "version": "${{ steps.version.outputs.VERSION }}",
+            "build": "${{ github.run_number }}",
+            "tag": "v${{ steps.version.outputs.V_TAG }}",
+            "commit": "${{ github.sha }}",
+            "platform": "linux"
+          }
+          EOF
 
       - name: Upload Linux Artifacts
         uses: actions/upload-artifact@v6
@@ -82,7 +93,7 @@ jobs:
             | Platform | File |
             |----------|------|
             | Linux (x64) | music_deewane_linux_x64_v${{ steps.version.outputs.V_TAG }}.tar.gz |
-          artifacts: music_deewane_linux_*.tar.gz
+          artifacts: music_deewane_linux_*.tar.gz music_deewane_linux_*_version.json
           token: ${{ github.token }}
           allowUpdates: true
           replacesArtifacts: false

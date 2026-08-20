@@ -6,7 +6,6 @@ import 'package:music_deewane/l10n/app_localizations.dart';
 import 'package:music_deewane/screens/widgets/music_deewane_ui_kit/music_deewane_dialog.dart';
 import 'package:music_deewane/screens/widgets/snackbar.dart';
 import 'package:music_deewane/services/plugin/plugin_event_bus.dart';
-import 'package:music_deewane/services/update_service.dart';
 import 'package:music_deewane/src/rust/api/plugin/events.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -120,11 +119,7 @@ class _GlobalEventListenerState extends State<GlobalEventListener> {
         MusicDeewaneDialogAction.text(l10n.buttonLater),
         MusicDeewaneDialogAction.filled(l10n.dialogUpdateNow, onPressed: () {
           Navigator.of(context).pop();
-          UpdateService().showDownloadDialog(
-            context,
-            url: state.downloadUrl,
-            version: '${state.newVersion}+${state.newBuild}',
-          );
+          openURL("https://github.com/aditya452007/Music_Deewane/releases");
         }),
       ],
     );

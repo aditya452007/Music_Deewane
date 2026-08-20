@@ -1,5 +1,4 @@
 import 'package:music_deewane/services/music_deewane_updater_tools.dart';
-import 'package:music_deewane/services/update_service.dart';
 import 'package:flutter/material.dart';
 import 'package:music_deewane/core/theme/app_theme.dart';
 import 'package:music_deewane/utils/url_launcher.dart';
@@ -114,12 +113,8 @@ class CheckUpdateView extends StatelessWidget {
                       padding: const EdgeInsets.all(8.0),
                       child: FilledButton(
                         onPressed: () {
-                          UpdateService().showDownloadDialog(
-                            context,
-                            url: snapshot.data?["download_url"] ?? '',
-                            version:
-                                '${snapshot.data?["newVer"] ?? ''}+${snapshot.data?["newBuild"] ?? ''}',
-                          );
+                          launchUrl2(Uri.parse(
+                              "https://github.com/aditya452007/Music_Deewane/releases"));
                         },
                         child: SizedBox(
                           width: 150,

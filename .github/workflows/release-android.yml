@@ -77,6 +77,16 @@ jobs:
           V_TAG="${{ steps.version.outputs.V_TAG }}"
           APK_DIR="build/app/outputs/flutter-apk"
           cp "$APK_DIR/app-release.apk" "music_deewane_android_v${V_TAG}.apk"
+          # Write version info for updater verification
+          cat > "music_deewane_android_v${V_TAG}_version.json" << EOF
+          {
+            "version": "${{ steps.version.outputs.VERSION }}",
+            "build": "${{ github.run_number }}",
+            "tag": "v${{ steps.version.outputs.V_TAG }}",
+            "commit": "${{ github.sha }}",
+            "platform": "android"
+          }
+          EOF
 
       - name: Upload Android Artifact
         uses: actions/upload-artifact@v6
@@ -102,7 +112,7 @@ jobs:
             | Platform | File |
             |----------|------|
             | Android | music_deewane_android_v${{ steps.version.outputs.V_TAG }}.apk |
-          artifacts: music_deewane_android_v*.apk
+          artifacts: music_deewane_android_v*.apk music_deewane_android_v*_version.json
           token: ${{ github.token }}
           allowUpdates: true
           replacesArtifacts: false
