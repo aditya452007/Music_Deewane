@@ -50,7 +50,10 @@ class _SongInfoScreenState extends State<SongInfoScreen> {
 
   String _getSourceName() {
     final parts = song.id.split('::');
-    if (parts.length >= 2) return parts[0];
+    if (parts.length >= 2) {
+      // Migrate old bloomfactory IDs for display without rewriting DB.
+      return parts[0].replaceAll('bloomfactory', 'musicdeewanefactory');
+    }
     return "Unknown";
   }
 

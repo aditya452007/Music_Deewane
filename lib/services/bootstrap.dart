@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:music_deewane/core/constants/setting_keys.dart';
 import 'package:music_deewane/core/di/service_locator.dart';
 import 'package:music_deewane/services/db/dao/settings_dao.dart';
+import 'package:music_deewane/services/db/plugin_id_migration_service.dart';
 import 'package:music_deewane/services/local_music_service.dart';
 import 'package:music_deewane/services/plugin_bootstrap_service.dart';
 import 'package:music_deewane/services/onboarding_service.dart';
@@ -29,6 +30,13 @@ Future<void> bootstrapApp() async {
   await DBProvider.init(
       appSupportPath: appSuppPath, appDocumentsPath: appDocPath);
   DBProvider.scheduleMaintenance();
+
+  // One-time migration: bloomfactory → musicdeewanefactory (DB + filesystem).
+  try {
+    await PluginIdMigrationService.run();
+  } catch (e, stack) {
+    log('PluginIdMigration failed (non-fatal)', error: e, stackTrace: stack, name: 'Bootstrap');
+  }
 
   // DI wiring (registers singletons).
   await ServiceLocator.setup();
