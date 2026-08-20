@@ -1,11 +1,11 @@
 [Setup]
 AppId={{B5E8A3A0-4K2L-9M1N-8P7Q-6R5S4T3U2V1W}
 AppName=Music Deewane
-AppVersion=1.0.1
+AppVersion=2.0.0
 AppPublisher=Music Deewane
 AppPublisherURL=https://github.com/aditya452007/Music_Deewane
 AppSupportURL=https://github.com/aditya452007/Music_Deewane/issues
-AppUpdatesURL=https://github.com/aditya452007/Music_Deewane/releases
+AppUpdatesURL=https://github.com/aditya452007/Music_Deewane/releases/latest
 DefaultDirName={autopf}\Music Deewane
 DefaultGroupName=Music Deewane
 AllowNoIcons=yes
@@ -21,7 +21,7 @@ PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 UninstallDisplayIcon={app}\Music Deewane.exe
 UninstallDisplayName=Music Deewane
-VersionInfoVersion=1.0.1.0
+VersionInfoVersion=2.0.0.0
 VersionInfoDescription=Music Deewane Installer
 VersionInfoCompany=Music Deewane
 

@@ -42,7 +42,7 @@ jobs:
           $line = Select-String -Path pubspec.yaml -Pattern '^version:\s*(\S+)' | Select-Object -First 1
           if (-not $line) { throw "version not found in pubspec.yaml" }
           $ver = $line.Matches[0].Groups[1].Value.Split('+')[0]
-          $vtag = "$ver+${{ github.run_number }}"
+          $vtag = "$ver-${{ github.run_number }}"
           "VERSION=$ver" >> $env:GITHUB_OUTPUT
           "V_TAG=$vtag" >> $env:GITHUB_OUTPUT
 
@@ -111,7 +111,7 @@ jobs:
         id: version
         run: |
           VERSION=$(grep -E '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
-          V_TAG="${VERSION}+${{ github.run_number }}"
+          V_TAG="${VERSION}-${{ github.run_number }}"
           echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
           echo "V_TAG=${V_TAG}" >> $GITHUB_OUTPUT
 
@@ -191,7 +191,7 @@ jobs:
         id: version
         run: |
           VERSION=$(grep -E '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
-          V_TAG="${VERSION}+${{ github.run_number }}"
+          V_TAG="${VERSION}-${{ github.run_number }}"
           echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
           echo "V_TAG=${V_TAG}" >> $GITHUB_OUTPUT
 
@@ -222,8 +222,11 @@ jobs:
     needs: [build-windows, build-android, build-linux]
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
       - name: Download All Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           path: all-artifacts
           pattern: release-assets-*
@@ -232,12 +235,13 @@ jobs:
         run: |
           mkdir -p release-artifacts
           find all-artifacts -type f -not -path '*/\.*' -exec cp {} release-artifacts/ \;
+          ls -la release-artifacts/
 
       - name: Extract version
         id: version
         run: |
           VERSION=$(grep -E '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
-          V_TAG="${VERSION}+${{ github.run_number }}"
+          V_TAG="${VERSION}-${{ github.run_number }}"
           echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
           echo "V_TAG=${V_TAG}" >> $GITHUB_OUTPUT
 
@@ -258,13 +262,15 @@ jobs:
             ### Downloads
             | Platform | File |
             |----------|------|
-            | Windows (x64) Portable | music_deewane_windows_v*.zip |
+            | Windows (x64) Portable | music_deewane_windows_v${{ steps.version.outputs.V_TAG }}.zip |
             | Windows (x64) MSIX | music_deewane.msix |
-            | Windows (x64) Installer | MusicDeewaneSetup_*.exe |
-            | Android | music_deewane_android_v*.apk |
-            | Linux (x64) | music_deewane_linux_x64_v*.tar.gz |
+            | Windows (x64) Installer | MusicDeewaneSetup_${{ steps.version.outputs.VERSION }}.exe |
+            | Android | music_deewane_android_v${{ steps.version.outputs.V_TAG }}.apk |
+            | Linux (x64) | music_deewane_linux_x64_v${{ steps.version.outputs.V_TAG }}.tar.gz |
           artifacts: release-artifacts/*
           token: ${{ github.token }}
           allowUpdates: true
           replacesArtifacts: true
-          makeLatest: legacy
+          makeLatest: true
+          draft: false
+          prerelease: false

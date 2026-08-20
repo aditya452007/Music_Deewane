@@ -3,7 +3,7 @@ description: Music Deewane - An Open source Free Music Player.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.1+1
+version: 2.0.0+1
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -124,7 +124,7 @@ msix_config:
   display_name: Music Deewane
   publisher_display_name: Music Deewane
   identity_name: com.musicdeewane.app
-  msix_version: 1.0.1.0
+  msix_version: 2.0.0.0
   logo_path: assets/icons/logo.png
   capabilities: internetClient, musicLibrary
   languages: en-us, hi-in
