@@ -60,6 +60,12 @@ class PluginBootstrapService {
   static const String hostedRepositoriesUrl =
       'https://aditya452007.github.io/Music_Deewane/repositories.json';
 
+  /// Direct fallback to the factory's bex-factory.json release asset.
+  /// Used when the hosted repositories.json is unreachable (GitHub Pages down,
+  /// stale cache, etc.). This URL is the canonical latest bex factory index.
+  static const String factoryDirectUrl =
+      'https://github.com/aditya452007/Music_Deewane_factory/releases/latest/download/bex-factory.json';
+
   static const int maxRetries = 3;
 
   static const Duration syncGap = Duration(minutes: 30);
@@ -597,20 +603,40 @@ class PluginBootstrapService {
   }
 
   static Future<List<_HostedRepoEntry>> _fetchHostedEntries() async {
-    final response = await http
-        .get(Uri.parse(hostedRepositoriesUrl))
-        .timeout(const Duration(seconds: 15));
-    if (response.statusCode != 200) {
-      throw Exception('HTTP ${response.statusCode}');
+    try {
+      final response = await http
+          .get(Uri.parse(hostedRepositoriesUrl))
+          .timeout(const Duration(seconds: 15));
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body) as Map<String, dynamic>;
+        final list = json['repositories'] as List<dynamic>?;
+        if (list != null) {
+          final entries = list
+              .map((e) =>
+                  _HostedRepoEntry.fromJson(Map<String, dynamic>.from(e as Map)))
+              .where((e) => e.url.isNotEmpty)
+              .toList();
+          if (entries.isNotEmpty) {
+            log('Fetched ${entries.length} entries from hosted repositories.json',
+                name: 'PluginBootstrap');
+            return entries;
+          }
+        }
+        log('Hosted repositories.json missing or empty, falling back to direct factory URL',
+            name: 'PluginBootstrap');
+      } else {
+        log('Hosted repositories.json HTTP ${response.statusCode}, falling back to direct factory URL',
+            name: 'PluginBootstrap');
+      }
+    } catch (e) {
+      log('Hosted repositories.json fetch failed ($e), falling back to direct factory URL',
+          name: 'PluginBootstrap');
     }
-    final json = jsonDecode(response.body) as Map<String, dynamic>;
-    final list = json['repositories'] as List<dynamic>?;
-    if (list == null) throw const FormatException('Missing "repositories" key');
-    return list
-        .map((e) =>
-            _HostedRepoEntry.fromJson(Map<String, dynamic>.from(e as Map)))
-        .where((e) => e.url.isNotEmpty)
-        .toList();
+    // Fallback: direct factory bex-factory.json — always valid as long as
+    // the factory has at least one successful release. This ensures the app
+    // can fetch and play songs even if GitHub Pages is down.
+    log('Using direct factory URL: $factoryDirectUrl', name: 'PluginBootstrap');
+    return [const _HostedRepoEntry(url: factoryDirectUrl, install: true)];
   }
 
   static Future<Uint8List> _downloadBytes(String url) async {
