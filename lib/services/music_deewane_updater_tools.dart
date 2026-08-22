@@ -130,15 +130,21 @@ Future<Map<String, dynamic>> getAppUpdates() async {
 Future<Map<String, dynamic>> getLatestVersion() async => await getAppUpdates();
 
 String? extractUpUrl(Map<String, dynamic> data) {
-  for (var element in (data["assets"] as List)) {
-    final url = element["browser_download_url"].toString();
-    if (url.contains("windows") && Platform.isWindows) {
-      return url;
-    } else if (url.contains("android") && Platform.isAndroid) {
-      return url;
-    } else if (url.contains("linux") && Platform.isLinux) {
-      return url;
+  final assets = data["assets"] as List;
+  // Prefer .zip for Windows (user choice) — first pass looks for windows + .zip
+  if (Platform.isWindows) {
+    for (var element in assets) {
+      final raw = element["browser_download_url"].toString();
+      final url = raw.toLowerCase();
+      if (url.contains("windows") && url.contains(".zip")) return raw;
     }
+  }
+  for (var element in assets) {
+    final raw = element["browser_download_url"].toString();
+    final url = raw.toLowerCase();
+    if (url.contains("windows") && Platform.isWindows) return raw;
+    if (url.contains("android") && Platform.isAndroid) return raw;
+    if (url.contains("linux") && Platform.isLinux) return raw;
   }
   return null;
 }

@@ -140,7 +140,7 @@ graph TD
 
 ### Flow: Settings, Updates, Shortcuts
 - `SettingsCubit`: 29 keys loaded in parallel, single emit; every setter persists (SettingsDAO string/bool K/V) + emits; EQ (10-band, presets, builtin/device source), crossfade, qualities, backup gate (≤1/day), music languages, favorite artists.
-- Updates: `GlobalEventsCubit.checkForUpdates` → `music_deewane_updater_tools.getAppUpdates()` → GitHub releases API only (SourceForge fallback removed — ADR-045) → `isUpdateAvailable()` (semantic version comparison only — build numbers removed, ADR-047) → `UpdateAvailable` state → `GlobalEventListener` shows update dialog → "Update Now" opens GitHub releases page in browser (in-app download removed — ADR-047). `NotificationCubit` only loads persisted notifications (no independent update check). Update button in Settings → Check for Updates also redirects to GitHub releases page.
+- Updates (ADR-051 — platform-aware direct download): `GlobalEventsCubit.checkForUpdates` → `music_deewane_updater_tools.getAppUpdates()` → GitHub `releases/latest` API → `extractUpUrl()` picks platform asset (Windows `.zip` preferred, Android `.apk`, Linux `.tar.gz`) → `isUpdateAvailable()` (semantic version only — ADR-047) → `UpdateAvailable(downloadUrl: platformAssetUrl ?? html_url)` → `GlobalEventListener` dialog `openURL(state.downloadUrl)` and Settings `CheckUpdateView` `launchUrl2(snapshot["download_url"] ?? latest)` — both simple browser redirect to direct asset (no `UpdateService` streaming). `NotificationCubit` only loads persisted notifications. Website `Music_Deewane/index.html`: cards `data-platform`, inline JS fetches same `releases/latest` API, maps `.zip/.apk/.tar.gz`, fallback `releases/latest` on error (auto-fetch per spec).
 - Desktop keyboard shortcuts (`KeyboardShortcutsHandler`): media keys, Space, ←/→, ↑/↓, R, S, M, L, T, Alt+←/→ seek (10s, ADR-023), Esc/Backspace (Up Next → player → back).
 
 ---
@@ -322,8 +322,8 @@ graph TD
 | Last.fm auth | `last.fm/api/auth` (browser token flow) | `ScrobbleRepository` |
 | Plugin catalogue | `https://aditya452007.github.io/Music_Deewane/repositories.json` (ghpage branch) → `https://github.com/aditya452007/Music_Deewane_factory/releases/latest/download/bex-factory.json` | `PluginBootstrapService` |
 | Plugin repos | user-added HTTP JSON + `.bex` downloads | `PluginRepositoryService` |
-| Updater | `https://api.github.com/repos/aditya452007/Music_Deewane/releases/latest` (GitHub only — ADR-045), `https://aditya452007.github.io/Music_Deewane/CHANGELOG.md` | `music_deewane_updater_tools` |
-| Download page | `https://github.com/aditya452007/Music_Deewane/releases` (fallback) | Update dialog |
+| Updater | `https://api.github.com/repos/aditya452007/Music_Deewane/releases/latest` (GitHub only — ADR-045/051; `assets[].browser_download_url` filtered by platform: windows→.zip, android→.apk, linux→.tar.gz) | `music_deewane_updater_tools` |
+| Download page | `https://github.com/aditya452007/Music_Deewane/releases/latest` (fallback) + direct ZIP/APK/tar.gz asset URLs | Update dialog + `Music_Deewane/index.html` cards |
 | Geo/country | `ipwho.is/`, `api.country.is/`, `ipapi.co/json/`, `ip-api.com/json` | Country allowlist (`CountryInfoService`) |
 | Discord RPC | app id `1339113296405725235` | `DiscordService` (desktop) |
 | Google Mobile Ads | App ID `ca-app-pub-4220631457594135~1863471881` — Ad Unit `ca-app-pub-4220631457594135/9953714892` (Native Advanced, test `3940256099942544/2247696110` in debug) — `app-ads.txt` `google.com, pub-4220631457594135, DIRECT, f08c47...` | `MobileAds.instance.initialize()` + `NativeAd` (`lib/services/ads/`) on Explore/Search/Library/PlaylistView; hidden on Web/Desktop/offline |

@@ -34,6 +34,7 @@
 ## Decision Index
 
 | ID | Date | Decision | Status | Affects |
+| ADR-051 | 2026-08-22 | Platform-aware direct downloads: website auto-fetch latest assets (zip/apk/tar.gz) + app Update Now uses platform asset URL (zip for Windows) | Accepted | Music_Deewane/index.html, music_deewane_updater_tools.dart, global_events_cubit.dart, global_event_listener.dart, check_update_view.dart |
 | ADR-050 | 2026-08-22 | Google Mobile Ads Native Advanced — always-on, Void Monochrome themed, 4 placements, policy compliant | Accepted | pubspec.yaml, AndroidManifest.xml, Info.plist, main.dart, lib/services/ads/ads_config.dart (new), lib/services/ads/native_ad_card.dart (new), explore_screen.dart, search_screen.dart, library_screen.dart, playlist_screen.dart, app-ads.txt (new), Music_Deewane/privacy.html |
 | ADR-048 | 2026-08-20 | Explore screen section filtering: exclude browse_discover, radio, trending sections + empty sections from plugin results | Accepted | explore_screen.dart |
 | ADR-049 | 2026-08-20 | CI/CD unified release workflow: merge 3 platform workflows into 1 to fix race condition; update button opens releases/latest and disappears after click | Accepted | release.yml (new), release-windows.yml (deleted), release-android.yml (deleted), release-linux.yml (deleted), check_update_view.dart, global_event_listener.dart |
@@ -121,6 +122,16 @@
 ## Decision Entries
 
 <!-- Newest decisions go at the top of this section. -->
+
+### ADR-051: Platform-aware direct downloads — website auto-fetch + in-app platform asset (zip/apk/tar.gz)
+- **Date**: 2026-08-22
+- **Status**: Accepted
+- **Context**: User asked to make both surfaces platform-aware: website download cards should directly download the artifact for their OS, and the in-app “Update Now” button should download the correct file (Windows .zip, Android .apk, Linux .tar.gz) instead of opening the generic releases page. Previous behavior (ADR-047, ADR-049) used `releases/latest` everywhere to avoid false positives but lost direct-download UX. GitHub Releases is single source of truth (`api.github.com/repos/.../releases/latest` returns `assets[].browser_download_url` whose names contain `windows`/`android`/`linux` — verified in `release.yml` artifact names).
+- **Options considered**: Website hardcoded version you paste each release (rejected — you asked for auto-fetch); website fetch latest API + map assets (chosen — zero manual edits, fallback to `/latest` on error/rate-limit). App in-app streaming download via `UpdateService.showDownloadDialog` + auto-install (rejected — you said “simple download asset”); app redirect to platform `browser_download_url` (chosen — one `launchUrl`, no permission/compat risk). Windows .zip vs .msix vs .exe installer (chosen .zip per your “use zip” confirmation).
+- **Decision**: (1) `Music_Deewane/index.html`: added `data-platform="android|windows|linux|macos|ios"` to download cards; inline IIFE fetches `https://api.github.com/repos/aditya452007/Music_Deewane/releases/latest`, maps `android→.apk`, `windows→.zip` (prefer `.zip` contains), `linux→.tar.gz`, sets `el.href`; `catch` keeps fallback `releases/latest` (handles CORS/rate-limit/network). (2) `lib/services/music_deewane_updater_tools.dart:132` `extractUpUrl`: two-pass — first pass returns Windows `.zip` if `Platform.isWindows`, second pass returns any `windows`/`android`/`linux` match (uses `raw` URL, case-insensitive). (3) `global_events_cubit.dart:35` fallback changed `.../releases` → `.../releases/latest`. (4) `global_event_listener.dart:111` `_showUpdateDialog` now `openURL(state.downloadUrl)` instead of hardcoded `latest`. (5) `check_update_view.dart:114` “Update Now” now `snapshot.data?["download_url"] ?? latest`.
+- **Why**: Reuses existing `extractUpUrl` / `download_url` plumbing (proof it works since ADR-044), shortest diff. Website auto-fetch matches your “auto-fetch and if error open latest” exactly. Platform check via `dart:io Platform.isX` is reliable for Android/Windows/Linux; unsupported platforms gracefully fall back to the HTML page. No new deps, no new screens.
+- **Consequences**: Website Android/Windows/Linux cards now download directly; macOS/iOS stay on `latest` (no assets yet). App “Update Now” (dialog + Settings) downloads the platform asset directly. GitHub API 60/hr anon limit applies to website (fine at current traffic); app already uses same API with 6s timeout.
+- **Affects**: `Music_Deewane/index.html`, `lib/services/music_deewane_updater_tools.dart`, `lib/blocs/global_events/global_events_cubit.dart`, `lib/screens/widgets/global_event_listener.dart`, `lib/screens/screen/home_views/setting_views/check_update_view.dart`
 
 ### ADR-050: Google Mobile Ads Native Advanced — always-on, policy compliant, Void Monochrome themed
 - **Date**: 2026-08-22

@@ -32,7 +32,8 @@ class GlobalEventsCubit extends Cubit<GlobalEventsState> {
         emit(UpdateAvailable(
           newVersion: updates["newVer"],
           newBuild: updates["newBuild"],
-          downloadUrl: updates["download_url"] ?? "https://github.com/aditya452007/Music_Deewane/releases",
+          downloadUrl: updates["download_url"] ??
+              "https://github.com/aditya452007/Music_Deewane/releases/latest",
         ));
       }
     }

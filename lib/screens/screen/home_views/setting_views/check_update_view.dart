@@ -113,8 +113,10 @@ class CheckUpdateView extends StatelessWidget {
                       padding: const EdgeInsets.all(8.0),
                       child: FilledButton(
                         onPressed: () {
-                          launchUrl2(Uri.parse(
-                              "https://github.com/aditya452007/Music_Deewane/releases/latest"));
+                          final url = snapshot.data?["download_url"]
+                                  as String? ??
+                              "https://github.com/aditya452007/Music_Deewane/releases/latest";
+                          launchUrl2(Uri.parse(url));
                         },
                         child: SizedBox(
                           width: 150,

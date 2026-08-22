@@ -119,8 +119,7 @@ class _GlobalEventListenerState extends State<GlobalEventListener> {
         MusicDeewaneDialogAction.text(l10n.buttonLater),
         MusicDeewaneDialogAction.filled(l10n.dialogUpdateNow, onPressed: () {
           Navigator.of(context).pop();
-          openURL(
-              "https://github.com/aditya452007/Music_Deewane/releases/latest");
+          openURL(state.downloadUrl);
         }),
       ],
     );
