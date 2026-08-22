@@ -14,6 +14,7 @@
 | Rust core | crate `rust_lib_music_deewane` (`rust/` + `rust_builder/` cargokit FFI plugin) | Plugin host, downloads, local music metadata |
 | Plugin runtime | `waclay` 0.2.2 + `wasm_runtime_layer` + **wasmi** (interpreter) | WASM component plugin execution |
 | Networking | Dart `http`; Rust `reqwest` 0.12 (blocking, rustls-tls) | HTTP in both layers |
+| Monetization | `google_mobile_ads` 9.1.0 + `webview_flutter` | Native Advanced ads (Android/iOS only, Void Monochrome theme, 60s interval, badge) |
 | Localization | `flutter_localizations` + `intl`, 7 locales (de, en, es, hi, ja, ko, zh) | l10n via ARB |
 
 ## Module Map (Dart, `lib/`)
@@ -27,7 +28,7 @@
 | `repository/` | Thin wrappers: downloads, notifications, scrobbling (`LastFM/lastfmapi.dart` HTTP client), search, settings |
 | `routes/` | `app_router.dart` — the single GoRouter config |
 | `screens/` | All UI: 5 shell branches, player, chart, common detail views, settings, library views, widgets (cards, mini player, overlays, dialogs, `bloomee_ui_kit/`) |
-| `services/` | DB + DAOs + mappers + legacy migration, player stack (engine/queue/resolver/error handling), plugin services, download, cache, import/export, updater, shortcuts, onboarding, Discord, bootstrap |
+| `services/` | DB + DAOs + mappers + legacy migration, player stack (engine/queue/resolver/error handling), plugin services, **ads** (`ads/ads_config.dart`, `ads/native_ad_card.dart` — Native advanced, always-on), download, cache, import/export, updater, shortcuts, onboarding, Discord, bootstrap |
 | `src/rust/` | **Generated** by flutter_rust_bridge — do not edit |
 | `utils/` | Helpers: ticker, url checker, country info, download types, palettes, image loading |
 | `l10n/` | ARB sources + generated localizations |
@@ -49,7 +50,7 @@
 - **Rust → WASM plugins**: `PluginManager.handle_plugin_request` (spawn_blocking + per-plugin tokio Mutex) → adapter → WIT bindgen export → WASM component; host functions: `http_request` (blocking reqwest, 30s timeout), `random_number`, `current_unix_timestamp`, storage get/set. Entity IDs stamped `"pluginId::"`.
 - **Rust → Dart events**: `StreamSink<PluginManagerEvent>` / `StreamSink<DownloadManagerEvent>` → broadcast buses in Dart.
 - **Playback boundary**: Rust produces URLs + metadata only — **no audio decoding in Rust**; media_kit decodes/plays in Dart.
-- **OS integration**: no custom native code anywhere — all via plugins (audio_service, media_kit, permission_handler, share_handler, etc.) and stock runners.
+- **OS integration**: no custom native code anywhere — all via plugins (audio_service, media_kit, permission_handler, share_handler, google_mobile_ads, etc.) and stock runners.
 
 ## Data Flow (top level)
 

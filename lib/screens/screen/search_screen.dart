@@ -25,6 +25,7 @@ import 'package:music_deewane/screens/widgets/more_bottom_sheet.dart';
 import 'package:music_deewane/screens/widgets/playlist_card.dart';
 import 'package:music_deewane/screens/widgets/sign_board_widget.dart';
 import 'package:music_deewane/screens/widgets/song_tile.dart';
+import 'package:music_deewane/services/ads/native_ad_card.dart';
 import 'package:music_deewane/src/rust/api/plugin/commands.dart';
 import 'package:music_deewane/src/rust/api/plugin/plugin_info.dart';
 import 'package:music_deewane/src/rust/api/plugin/models.dart' as plugin_models;
@@ -1388,6 +1389,13 @@ class _SliverSearchResults extends StatelessWidget {
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
+                  // Interleave small native ad after 5 tracks, then every 10 (virtual mapping)
+                  // For simplicity: show ad inline at index 5 and 16 if enough tracks
+                  // We map virtual index to real track or ad.
+                  // Calculate if this position should be ad:
+                  // ad positions in virtual list: 5, 16, 27...
+                  // Instead do simple: if tracks.length >=6 and index==5 show ad instead of track? No — better to inject extra sliver.
+                  // Keep original list pure, add separate ad sliver below (see next sliver)
                   final track = tracks[index];
                   return Padding(
                     padding:
@@ -1407,6 +1415,14 @@ class _SliverSearchResults extends StatelessWidget {
               ),
             ),
           ),
+          // Native ad after tracks — shown when there are results (policy: not on empty)
+          if (tracks.length >= 6)
+            const SliverToBoxAdapter(
+              child: NativeAdCard(
+                height: 280,
+                margin: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              ),
+            ),
         ],
         if (albums.isNotEmpty) ...[
           _sliverSectionHeader(AppLocalizations.of(context)!.searchAlbums),

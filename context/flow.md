@@ -14,7 +14,9 @@ Music_Deewane is a Flutter music player: the UI (screens + blocs) requests conte
 Rust core via flutter_rust_bridge; the Rust core dispatches typed commands to WASM plugins
 (resolvers/providers) that fetch real music data over HTTP; playback is done by media_kit
 wrapped in audio_service. Everything user-owned (playlists, downloads, history, settings,
-lyrics, plugin storage) persists in an Isar database.
+lyrics, plugin storage) persists in an Isar database. Monetization via Google Mobile Ads
+Native Advanced (Android/iOS only, Void Monochrome themed, always-on, 60s refresh, hidden on
+Web/Desktop/offline/failure).
 
 ---
 
@@ -29,6 +31,8 @@ graph TD
         SVC --> PS[PluginService] --> BR[lib/src/rust bridge]
         SVC --> PL[PlayerEngine media_kit]
         PL --> AS[audio_service / MPRIS / SMTC]
+        SVC --> ADS[AdsService NativeAdCard]
+        ADS --> GMA[Google Mobile Ads SDK]
     end
     subgraph Rust (rust_lib_Bloomee)
         BR --> PM[PluginManager]
@@ -39,6 +43,7 @@ graph TD
     end
     HTTP --> NET[Provider APIs / plugin repos]
     DAO --> LEGACY[legacy migration]
+    GMA --> ADNET[AdMob Ad Server]
 ```
 
 ---
@@ -46,23 +51,25 @@ graph TD
 ## User Flows (verified from code)
 
 ### Flow: App launch → gates → Home
-1. `main()` (`lib/main.dart:152`): `MediaKit.ensureInitialized()` → `bootstrapApp()` → `setHighRefreshRate()` → `setupPlayerCubit()` (audio session → `AudioService.init` → `MusicDeewanePlayer`) → `DiscordService.initialize()` → `runApp`.
+1. `main()` (`lib/main.dart:153`): `WidgetsFlutterBinding.ensureInitialized()` → `MobileAds.instance.initialize()` (Android/iOS only, no-op on Web/Desktop) → `MediaKit.ensureInitialized()` → `bootstrapApp()` → `setHighRefreshRate()` → `setupPlayerCubit()` (audio session → `AudioService.init` → `MusicDeewanePlayer`) → `DiscordService.initialize()` → `runApp`.
 2. `MyApp.initState`: computes `_migrationPending` / `_onboardingPending` / `_pluginBootstrapPending`.
 3. Gates in order: `LegacyMigrationOverlay` → `OnboardingOverlay` → `PluginBootstrapOverlay`; each `onComplete` re-checks the rest.
 4. **Onboarding (ADR-037)**: single-step screen — Language + Country (auto-detect toggle, device-locale guess). Skip/Continue both call `_finish()`, which persists `SettingKeys.languageCode`/`countryCode`/`autoGetCountry` and marks onboarding done. (Music-language & artist selection steps were removed in ADR-037; favorite artists / music languages can still be edited via Settings → Manage Preferences.)
 5. Spinner until player initialized → `MultiBlocProvider` (22 providers, including `RecommendationCubit`) → `MaterialApp.router` → `GlobalFooter` shell (5 tabs) → initial `/Explore`.
 6. On resume: player health check (`revive()`), plugin repo sync (30-min cooldown).
 
-### Flow: Home / Discovery
-- **Section order** (ADR-026, ADR-027, ADR-030): DiscoverBar → QuickAccessChips → TopPicksWidget → ForYouSection → TabSongListWidget (Last.fm) → _HomeSectionsList (plugin sections).
+### Flow: Home / Discovery (with Ads ADR-050)
+- **Section order**: DiscoverBar → QuickAccessChips → TopPicksWidget → **NativeAdCard (280dp, after TopPicks, always-on)** → TabSongListWidget (Last.fm, if enabled) → _HomeSectionsList (plugin sections interleaved: every 3 sections + 1 NativeAdCard, virtual index mapping `(i+1)%4==0` → ad).
+- **Ads on Explore**: Top ad reserved space with spinner until `onAdLoaded`; interleaved ads use `ListView.builder` without `itemExtent` (275 section, 296 ad). Hidden when `sections.length <2`, `homeSectionsStatus != loaded`, offline, or failure → `SizedBox.shrink`.
 - `QuickAccessChips` ← `LibraryItemsCubit` → horizontal scrollable pill row of user playlists (pinned first, then unpinned); tap → `context.pushNamed(RoutePaths.playlistView, extra: storageKey)`.
 - `TopPicksWidget` ← `RecentlyCubit` → paginated grid (3×3 mobile, 5×4 desktop) via `PageView` + `GridView.count`; tap → `player.loadPlaylist(...)`; long press → `showMoreBottomSheet`; refresh button re-shuffles.
 - `ForYouSection` (ADR-030, ADR-032) ← `RecommendationCubit` → tracks grouped by artist reason → each group: "Because you listened to [Artist]" header + paginated grid (3×3 mobile, 5×4 desktop) via `PageView` + `GridView.count`; tap → `player.loadPlaylist(...)`; long press → `showMoreBottomSheet`; refresh button recomputes scores.
 - `ExploreScreen` → `ContentBloc.getHomeSections` → `PluginService.execute` → Rust `PluginManager` → active **content resolver** plugin `getHomeSections` → `HomeSections` → section cards (filtered: `browse_discover`, `radio`, `trending` excluded; empty sections excluded) → `LoadMoreHomeSectionItems` (pageToken) for infinite scroll.
 - Recents: `RecentlyCubit` ← `HistoryDAO.watchHistory`; full history view via `HistoryView` (accessible from settings/notifications area).
 
-### Flow: Search
+### Flow: Search (with Ads ADR-050)
 - `SearchScreen` (own `ContentBloc` + `SearchSuggestionBloc`): typing → suggestions (debounced, DB history + suggestion plugin) → submit → `SearchContent(query, filter)` (300ms debounce + switchMap) → `PagedMediaItems` → results; scroll end → `LoadMoreSearchContent`.
+- **Ads on Search**: `_SliverSearchResults` injects one `NativeAdCard (280dp)` after tracks when `tracks.length >=6` (SliverToBoxAdapter). Hidden on empty results, loading skeleton, offline, or failure.
 - **Empty results (ADR-029)**: When 0 results returned, shows available content plugins as `ActionChip` source-switching buttons. Tapping a chip switches the active plugin and re-runs the search in-app. No external links.
 - **Skeleton loading (ADR-028)**: `CircularProgressIndicator` replaced with `_SearchSkeleton` — 4 gray rounded rectangles with `AnimatedOpacity` pulse.
 - Library search: `LibrarySearchCubit` → `PlaylistDAO.searchLibrary` (title contains, excludes system playlists).
@@ -84,9 +91,11 @@ graph TD
 - `DownloaderCubit.downloadSong` → `RustDownloadService.enqueue` → Rust `DownloadManager` (resumable, retry/backoff, `.part` files, tag embedding) → events (`taskUpdated`/`taskCompletedPendingAck`/`taskRemoved`) → `DownloadDAO.putDownload` (TrackDB + `_DOWNLOADS` playlist + DownloadDB) → library refresh (600ms debounce).
 - Offline tab (`OfflineScreen`) lists `state.downloaded`; playback resolves from local file first.
 
-### Flow: Library
+### Flow: Library (with Ads ADR-050)
 - `LibraryItemsCubit`: playlists CRUD (`PlaylistDAO`), likes (`Liked` playlist), history (`HistoryDAO.recordPlay` — 15s/40% rule via `RecentlyPlayedTracker`), saved remote collections (`LibraryDAO`), pin/reorder.
+- **Ads on Library**: `LibraryScreen` injects one `NativeAdCard (280dp)` as `SliverToBoxAdapter` after `_ListOfPlaylists` when `!isSearching && playlists.length >=3` (bottom of list, never on empty guided state or offline).
 - `PlaylistView` (`CurrentPlaylistCubit`): staged hydration, 40/page infinite scroll, edit/reorder (`PlaylistEditView`), download-all, share/export (`ImportExportService` + `SharePlus`), delete.
+- **Ads on PlaylistView (ADR-050)**: Desktop `_buildDesktopLayout` left panel after `_buildActions` when `tracks.length >=5`; Mobile `_buildMobileLayout` `SliverToBoxAdapter` below header when `tracks.length >=5`; both use `NativeAdCard (280dp)`.
 - Add-to-playlist: `AddToPlaylistCubit` → `AddToPlaylistScreen` (optimistic per-playlist toggle with rollback).
 - Local music: `LocalMusicCubit` → permission (Android MediaStore via photo_manager; desktop folder scan via Rust `scanAudioFiles`).
 
@@ -117,6 +126,12 @@ graph TD
 - `ForYouSection` ← `RecommendationCubit` → horizontal scroll cards with "Because you listened to [artist]" context
 - Watch: `HistoryDAO.watchHistory()` → auto-refresh recommendations on new plays
 - `refresh()` method recomputes scores on demand
+
+### Flow: Ads — Google Mobile Ads Native Advanced (ADR-050)
+- `main()` → `MobileAds.instance.initialize()` (Android/iOS only) → `AdsConfig.isSupported` (defaultTargetPlatform check) → `AdsConfig.nativeAdUnitId` (test in debug, prod `ca-app-pub-4220631457594135/9953714892` in release)
+- `NativeAdCard` (Stateful): `initState` → `NativeAd(adUnitId, NativeAdListener, AdRequest, NativeTemplateStyle(medium, #27272A))..load()` → `AdWidget` on `onAdLoaded`; `onAdFailedToLoad` → dispose + `_didFail=true` → `SizedBox.shrink`; `BlocBuilder<ConnectivityCubit>` hides when disconnected; outer container Void Monochrome (#18181B bg, #27272A template) with "Ad" badge (policy distinguishable).
+- **Policy**: never in player/mini-player/UpNext/sidebar/nav, never on empty/offline/loading, 60s+ interval (no auto-refresh, dispose on nav), badge required, test IDs in debug.
+- Placements: Explore (after TopPicks + every 3 sections), Search (after tracks ≥6), Library (bottom ≥3 playlists), PlaylistView (header ≥5 tracks). Each `NativeAd` is independent (own State, own `Ad` instance, own `load()`).
 
 ### Flow: Manage Preferences (ADR-030)
 - Settings → Manage Preferences → `ManagePreferencesScreen`
@@ -225,6 +240,15 @@ DownloaderCubit → RustDownloadService.initialize(pluginManager, stateDir, temp
   → events → _handleDownloadEvent → DownloadDAO.putDownload → _DOWNLOADS playlist
 ```
 
+### Ads
+```
+main() → MobileAds.instance.initialize() (platform-gated)
+  NativeAdCard.initState → NativeAd(..NativeTemplateStyle..)..load() → AdWidget (onAdLoaded)
+    → Google AdMob server (adUnit 9953714892 / test 2247696110)
+  BlocBuilder<ConnectivityCubit> → hidden when disconnected
+  onAdFailedToLoad → dispose → shrink (no retry)
+```
+
 ---
 
 ## Route Map (go_router — `lib/routes/app_router.dart`)
@@ -302,6 +326,7 @@ graph TD
 | Download page | `https://github.com/aditya452007/Music_Deewane/releases` (fallback) | Update dialog |
 | Geo/country | `ipwho.is/`, `api.country.is/`, `ipapi.co/json/`, `ip-api.com/json` | Country allowlist (`CountryInfoService`) |
 | Discord RPC | app id `1339113296405725235` | `DiscordService` (desktop) |
+| Google Mobile Ads | App ID `ca-app-pub-4220631457594135~1863471881` — Ad Unit `ca-app-pub-4220631457594135/9953714892` (Native Advanced, test `3940256099942544/2247696110` in debug) — `app-ads.txt` `google.com, pub-4220631457594135, DIRECT, f08c47...` | `MobileAds.instance.initialize()` + `NativeAd` (`lib/services/ads/`) on Explore/Search/Library/PlaylistView; hidden on Web/Desktop/offline |
 | Music data | **none in repo** — via WASM plugins' own HTTP | plugins only |
 
 ## State Flow
@@ -311,6 +336,7 @@ graph TD
 3. Persistence: cubit setters → repositories → DAOs → Isar; DB watchers drive reactive lists (history, library, downloads).
 4. Rust events (plugin lifecycle, download tasks) flow in via broadcast buses → blocs → UI.
 5. **Network state (ADR-028)**: `ConnectivityCubit` (root-provided) drives `OfflineBanner` overlay in `GlobalFooter`. Banner slides in/out via `AnimatedContainer`. Reconnection triggers auto-dismiss snackbar via `BlocConsumer` listener.
+6. **Ads state (ADR-050)**: `NativeAdCard` is self-contained `StatefulWidget` — owns `NativeAd`, `isLoaded`/`didFail` flags, `dispose()` frees `Ad`. No global cubit; each card independent. `BlocBuilder<ConnectivityCubit>` hides instantly when offline (no request). `AdsConfig.isSupported` (kIsWeb + defaultTargetPlatform) gates all ad creation — Web/Desktop render `SizedBox.shrink` with zero cost.
 
 ---
 

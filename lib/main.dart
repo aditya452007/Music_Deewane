@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:io' as io;
+import 'package:flutter/foundation.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:music_deewane/blocs/downloader/cubit/downloader_cubit.dart';
 import 'package:music_deewane/blocs/global_events/global_events_cubit.dart';
 import 'package:music_deewane/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
@@ -152,6 +154,16 @@ Future<void> setupPlayerCubit() async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Google Mobile Ads — Android/iOS only, no-op on Web/Desktop
+  if (!kIsWeb) {
+    try {
+      if (io.Platform.isAndroid || io.Platform.isIOS) {
+        await MobileAds.instance.initialize();
+      }
+    } catch (_) {
+      // Platform check can throw on Web/Desktop — ignore
+    }
+  }
   GestureBinding.instance.resamplingEnabled = true;
   MediaKit.ensureInitialized();
   await bootstrapApp();

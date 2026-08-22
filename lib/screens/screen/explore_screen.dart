@@ -19,6 +19,7 @@ import 'package:music_deewane/screens/widgets/more_bottom_sheet.dart';
 import 'package:music_deewane/screens/widgets/sign_board_widget.dart';
 import 'package:music_deewane/screens/widgets/song_tile.dart';
 import 'package:music_deewane/screens/widgets/top_picks_widget.dart';
+import 'package:music_deewane/services/ads/native_ad_card.dart';
 import 'package:flutter/material.dart';
 import 'package:music_deewane/screens/screen/home_views/notification_view.dart';
 import 'package:music_deewane/screens/screen/home_views/setting_view.dart';
@@ -183,6 +184,12 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   delegate: SliverChildListDelegate(
                     [
                       const TopPicksWidget(),
+                      // Native ad — always on, hidden automatically on Web/Desktop/offline
+                      const NativeAdCard(
+                        height: 280,
+                        margin:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      ),
                       BlocBuilder<SettingsCubit, SettingsState>(
                         builder: (context, state) {
                           if (state.lFMPicks) {
@@ -378,30 +385,45 @@ class _HomeSectionsList extends StatelessWidget {
             !_excludedTitles.hasMatch(s.title) &&
             s.items.isNotEmpty)
         .toList();
+    // Interleave Native ad every 3 sections (policy: not as first item, max 1 per 3)
+    final totalItems = filtered.length + (filtered.length ~/ 3);
     return ListView.builder(
       shrinkWrap: true,
-      itemExtent: 275,
+      // variable height — 275 for sections, 296 for ads (280 + 16 margin)
       padding: const EdgeInsets.only(top: 0),
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: filtered.length,
-      itemBuilder: (context, index) {
-        final section = filtered[index];
-        return HorizontalCardView(
-          section: section,
-          pluginId: contentBloc.state.activePluginId ?? '',
-          canLoadMore: section.moreLink != null,
-          isLoadingMore: state.isHomeSectionLoading(section.id),
-          onLoadMore: section.moreLink == null
-              ? null
-              : () {
-                  contentBloc.add(
-                    LoadMoreHomeSectionItems(
-                      pluginId: contentBloc.state.activePluginId ?? '',
-                      sectionId: section.id,
-                      moreLink: section.moreLink!,
-                    ),
-                  );
-                },
+      itemCount: totalItems,
+      itemBuilder: (context, virtualIndex) {
+        // Every 4th slot is an ad (3 sections + 1 ad)
+        if ((virtualIndex + 1) % 4 == 0) {
+          return NativeAdCard(
+            height: 280,
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          );
+        }
+        final sectionIndex = virtualIndex - (virtualIndex ~/ 4);
+        // guard against overflow when filtered not divisible by 3
+        if (sectionIndex >= filtered.length) return const SizedBox.shrink();
+        final section = filtered[sectionIndex];
+        return SizedBox(
+          height: 275,
+          child: HorizontalCardView(
+            section: section,
+            pluginId: contentBloc.state.activePluginId ?? '',
+            canLoadMore: section.moreLink != null,
+            isLoadingMore: state.isHomeSectionLoading(section.id),
+            onLoadMore: section.moreLink == null
+                ? null
+                : () {
+                    contentBloc.add(
+                      LoadMoreHomeSectionItems(
+                        pluginId: contentBloc.state.activePluginId ?? '',
+                        sectionId: section.id,
+                        moreLink: section.moreLink!,
+                      ),
+                    );
+                  },
+          ),
         );
       },
     );

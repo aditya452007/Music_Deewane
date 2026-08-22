@@ -18,6 +18,7 @@ import 'package:music_deewane/screens/widgets/play_pause_widget.dart';
 import 'package:music_deewane/screens/widgets/sign_board_widget.dart';
 import 'package:music_deewane/screens/widgets/snackbar.dart';
 import 'package:music_deewane/screens/widgets/song_tile.dart';
+import 'package:music_deewane/services/ads/native_ad_card.dart';
 import 'package:music_deewane/core/theme/app_theme.dart';
 import 'package:music_deewane/utils/load_image.dart';
 import 'package:music_deewane/l10n/app_localizations.dart';
@@ -322,6 +323,14 @@ class _PlaylistViewState extends State<PlaylistView> {
                       _buildActions(state, fgColor, bgColor, isCentered: true),
                 ),
 
+                if (state.playlist.tracks.length >= 5) ...[
+                  const SizedBox(height: 20),
+                  const NativeAdCard(
+                    height: 280,
+                    margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  ),
+                ],
+
                 const Spacer(flex: 2), // Bottom breathing room
               ],
             ),
@@ -388,8 +397,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                                   backgroundColor: Default_Theme.accentColor2,
                                   foregroundColor: Colors.white,
                                   shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(12)),
+                                      borderRadius: BorderRadius.circular(12)),
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 24, vertical: 12),
                                 ),
@@ -460,6 +468,14 @@ class _PlaylistViewState extends State<PlaylistView> {
             ),
           ),
         ),
+        // Native ad below header on mobile — always on (hidden on empty/offline internally)
+        if (state.playlist.tracks.length >= 5)
+          const SliverToBoxAdapter(
+            child: NativeAdCard(
+              height: 280,
+              margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            ),
+          ),
         if (state.playlist.tracks.isEmpty && !state.isLoadingMore)
           SliverFillRemaining(
             hasScrollBody: false,
@@ -471,26 +487,23 @@ class _PlaylistViewState extends State<PlaylistView> {
                   children: [
                     Icon(MingCute.playlist_line,
                         size: 56,
-                        color: Default_Theme.primaryColor2
-                            .withValues(alpha: 0.5)),
+                        color:
+                            Default_Theme.primaryColor2.withValues(alpha: 0.5)),
                     const SizedBox(height: 20),
                     Text(l10n.playlistEmptyTitle,
                         style: Default_Theme.primaryTextStyle.merge(
                             const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700))),
+                                fontSize: 20, fontWeight: FontWeight.w700))),
                     const SizedBox(height: 8),
                     Text(l10n.playlistEmptyHint,
                         textAlign: TextAlign.center,
-                        style: Default_Theme.secondoryTextStyle.merge(
-                            TextStyle(
-                                color: Default_Theme.primaryColor2
-                                    .withValues(alpha: 0.6),
-                                fontSize: 13))),
+                        style: Default_Theme.secondoryTextStyle.merge(TextStyle(
+                            color: Default_Theme.primaryColor2
+                                .withValues(alpha: 0.6),
+                            fontSize: 13))),
                     const SizedBox(height: 24),
                     FilledButton.icon(
-                      onPressed: () =>
-                          context.goNamed(RoutePaths.searchScreen),
+                      onPressed: () => context.goNamed(RoutePaths.searchScreen),
                       icon: const Icon(MingCute.search_line, size: 18),
                       label: Text(l10n.playlistEmptyAdd),
                       style: FilledButton.styleFrom(
@@ -793,8 +806,8 @@ class _PlaylistViewState extends State<PlaylistView> {
         l10n.playlistRemovedTrack(track.title, cubit.state.playlist.title));
   }
 
-  Future<void> _handleDownload(CurrentPlaylistState state,
-      AppLocalizations l10n) async {
+  Future<void> _handleDownload(
+      CurrentPlaylistState state, AppLocalizations l10n) async {
     final items =
         (await context.read<CurrentPlaylistCubit>().ensureAllTracksLoaded())
             .tracks;

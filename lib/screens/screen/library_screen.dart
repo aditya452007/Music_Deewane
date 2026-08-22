@@ -20,6 +20,7 @@ import 'package:music_deewane/blocs/library/cubit/library_items_cubit.dart';
 import 'package:music_deewane/core/constants/route_paths.dart';
 import 'package:music_deewane/screens/widgets/create_playlist_bottomsheet.dart';
 import 'package:music_deewane/screens/widgets/libitem_tile.dart';
+import 'package:music_deewane/services/ads/native_ad_card.dart';
 import 'package:music_deewane/core/theme/app_theme.dart';
 import 'package:music_deewane/l10n/app_localizations.dart';
 import 'package:iconsx_plus/iconsx_plus.dart';
@@ -168,8 +169,8 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
                           _EmptyLibraryAction(
                               icon: MingCute.new_folder_line,
                               label: l10n.libraryEmptyLocal,
-                              onTap: () => context
-                                  .goNamed(RoutePaths.localMusicScreen)),
+                              onTap: () =>
+                                  context.goNamed(RoutePaths.localMusicScreen)),
                         ],
                       ),
                     ),
@@ -310,6 +311,17 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
                               ? null
                               : () => setState(() => _isReordering = true),
                         ),
+                        // Native ad at bottom — always on, hidden on empty/offline internally
+                        if (!_isSearching &&
+                            !isSearching &&
+                            filteredPlaylists.length >= 3)
+                          const SliverToBoxAdapter(
+                            child: NativeAdCard(
+                              height: 280,
+                              margin: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 10),
+                            ),
+                          ),
                       ],
                     ],
                   ],
