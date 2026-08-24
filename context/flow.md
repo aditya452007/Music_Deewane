@@ -57,6 +57,7 @@ graph TD
 4. **Onboarding (ADR-037)**: single-step screen — Language + Country (auto-detect toggle, device-locale guess). Skip/Continue both call `_finish()`, which persists `SettingKeys.languageCode`/`countryCode`/`autoGetCountry` and marks onboarding done. (Music-language & artist selection steps were removed in ADR-037; favorite artists / music languages can still be edited via Settings → Manage Preferences.)
 5. Spinner until player initialized → `MultiBlocProvider` (22 providers, including `RecommendationCubit`) → `MaterialApp.router` → `GlobalFooter` shell (5 tabs) → initial `/Explore`.
 6. On resume: player health check (`revive()`), plugin repo sync (30-min cooldown).
+7. **Plugin bootstrap (ADR-053 fix)**: `PluginBootstrapService.run` now partial-success aware — `hasInstalled = installedIds.isNotEmpty`; if any plugin available, it seeds auto-load, calls `autoSelectPluginDefaults` (so `homePluginId` never empty after partial), marks `repositoriesBootstrapped=true` even when some `.bex` failed, and returns `success=true` (unblocks radio). `CountryInfoService.resolveCountryCodeForPolicyCheck` now falls back to device locale then `IN` instead of `''`, so fresh-install allow-list never blocks. `PluginBloc` seeds auto-load from disk when DB empty but files exist.
 
 ### Flow: Home / Discovery (with Ads ADR-050)
 - **Section order**: DiscoverBar → QuickAccessChips → TopPicksWidget → **NativeAdCard (280dp, after TopPicks, always-on)** → TabSongListWidget (Last.fm, if enabled) → _HomeSectionsList (plugin sections interleaved: every 3 sections + 1 NativeAdCard, virtual index mapping `(i+1)%4==0` → ad).
@@ -81,7 +82,7 @@ graph TD
 
 ### Flow: Playback
 1. Tap play → `MusicDeewanePlayer.loadPlaylist(playlist, idx, doPlay)` → `QueueManager` → `PlayerEngine.load/play` (media_kit dual-player).
-2. Stream resolution: `MediaResolverService.resolve` — **offline first** (`DownloadDAO`) → else plugin `GetStreams` → `StreamQualitySelector` (quality pref + fallback chain, URL/header validity check).
+2. Stream resolution: `MediaResolverService.resolve` — **offline first** (`DownloadDAO`) → else plugin `GetStreams` (with legacy `bloomfactory→musicdeewanefactory` remap, ADR-053) → `StreamQualitySelector` (quality pref + fallback chain, URL/header validity check).
 3. `_preResolveNextTrack()` → `engine.preloadNext`; `_onTrackCompleted` → advance (loop-aware); auto-queue via `RelatedSongsManager` (`LoadMorePlaylistTracks`); unresolvable tracks → `SmartTrackReplacementService` (cross-plugin, setting-gated).
 4. **Error recovery (ADR-028)**: First retry attempt shows brief "Having trouble..." toast. After 3 failed retries, message suggests "Try another source or use Smart Replace". When last track finishes, `MiniPlayerCubit.isCompleted` triggers "Queue finished. Add more music?" prompt linking to Search.
 5. OS integration: `_broadcastPlaybackState` → audio_service `PlaybackState`/`MediaItem` (via `TrackAdapter`) → lock screen/notification/headset/Discord.
@@ -230,8 +231,8 @@ PluginService.execute / install / load / unload          lib/services/plugin/plu
   └─ bridge fns (lib/src/rust/api/bridge.dart) → Rust PluginManager (rust/src/api/plugin/plugin.rs)
        └─ adapters → bindgen exports → WASM component (wasmi via waclay)
   └─ events → PluginEventBus → PluginBloc / PluginStorageService
-PluginBootstrapService (first-run + 30-min sync): repositories.json → bex-factory.json (Music_Deewane_factory releases) → .bex download → install
-Plugin IDs use `musicdeewanefactory` publisher (ADR-043): {type}.musicdeewanefactory.{name} (e.g. content-resolver.musicdeewanefactory.jisaavn)
+PluginBootstrapService (first-run + 30-min sync): repositories.json → bex-factory.json (Music_Deewane_factory releases) → .bex download → install (partial-success still unblocks + autoSelect, ADR-053)
+Plugin IDs use `musicdeewanefactory` publisher (ADR-043): {type}.musicdeewanefactory.{name} (e.g. content-resolver.musicdeewanefactory.jisaavn); MediaResolverService remaps legacy bloomfactory→musicdeewanefactory (ADR-053)
 ```
 
 ### Downloads

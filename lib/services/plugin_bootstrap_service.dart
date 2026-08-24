@@ -261,20 +261,21 @@ class PluginBootstrapService {
           name: 'PluginBootstrap');
     }
 
-    if (errors.isEmpty) {
-      // Ensure all installed plugins (the ones we just installed/updated)
-      // are added to the auto-load list so they are actually used.
+    // ponytail: partial success must still unblock radio — if any plugin is
+    // available, mark bootstrap done and ensure it auto-loads, even when
+    // some installs failed. Marking done only on errors.isEmpty blocked
+    // fresh installs forever when a single .bex timed out.
+    final hasInstalled = installedIds.isNotEmpty;
+    if (hasInstalled) {
+      // Ensure all installed plugins are in the auto-load list so they
+      // are actually used (previously only on errors.isEmpty).
       try {
         final loadStateService = PluginLoadStateService(settingsDao);
-
-        // Ensure everything that is "available" and part of our bootstrap
-        // is in the auto-load list.
         final available = await _safeGetAvailable(pluginService);
         final bootstrapIds = available
             .where((p) => installedIds.contains(p.manifest.id))
             .map((p) => p.manifest.id)
             .toSet();
-
         if (bootstrapIds.isNotEmpty) {
           await loadStateService.addAutoLoadPluginIds(bootstrapIds);
           log('Added ${bootstrapIds.length} plugins to auto-load list',
@@ -283,20 +284,33 @@ class PluginBootstrapService {
       } catch (e) {
         log('Failed to update auto-load list: $e', name: 'PluginBootstrap');
       }
-
+      // Auto-pick home/search/suggestion defaults even on partial success,
+      // otherwise Explore shows "No content plugin loaded".
+      try {
+        await autoSelectPluginDefaults(pluginService, settingsDao);
+      } catch (e) {
+        log('autoSelect defaults failed (non-fatal): $e',
+            name: 'PluginBootstrap');
+      }
       await _markDone(settingsDao);
-      log('Plugin bootstrap completed successfully.', name: 'PluginBootstrap');
+      if (errors.isEmpty) {
+        log('Plugin bootstrap completed successfully.',
+            name: 'PluginBootstrap');
+      } else {
+        log('Plugin bootstrap completed with ${errors.length} error(s) — partial success, ${installedIds.length} plugin(s) available; continuing.',
+            name: 'PluginBootstrap');
+      }
     } else {
-      log('Plugin bootstrap completed with ${errors.length} error(s).',
+      log('Plugin bootstrap completed with ${errors.length} error(s) — no plugins available.',
           name: 'PluginBootstrap');
     }
 
     onProgress(const PluginBootstrapProgress(100));
 
     return PluginBootstrapResult(
-      success: errors.isEmpty,
+      success: hasInstalled || errors.isEmpty,
       errors: errors,
-      failureReason: errors.isEmpty
+      failureReason: (hasInstalled || errors.isEmpty)
           ? PluginBootstrapFailureReason.none
           : PluginBootstrapFailureReason.setupFailed,
     );
@@ -612,8 +626,8 @@ class PluginBootstrapService {
         final list = json['repositories'] as List<dynamic>?;
         if (list != null) {
           final entries = list
-              .map((e) =>
-                  _HostedRepoEntry.fromJson(Map<String, dynamic>.from(e as Map)))
+              .map((e) => _HostedRepoEntry.fromJson(
+                  Map<String, dynamic>.from(e as Map)))
               .where((e) => e.url.isNotEmpty)
               .toList();
           if (entries.isNotEmpty) {

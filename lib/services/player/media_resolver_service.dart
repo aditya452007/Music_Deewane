@@ -91,15 +91,26 @@ class MediaResolverService {
       );
     }
 
+    // ponytail: legacy rebrand bloomfactory → musicdeewanefactory. Old DB
+    // tracks still carry bloomfactory IDs; remap so streams resolve without
+    // requiring a user DB wipe.
+    final effectivePluginId = parts.pluginId.contains('bloomfactory')
+        ? parts.pluginId.replaceAll('bloomfactory', 'musicdeewanefactory')
+        : parts.pluginId;
+    if (effectivePluginId != parts.pluginId) {
+      log('Remapped legacy pluginId ${parts.pluginId} → $effectivePluginId',
+          name: 'MediaResolverService');
+    }
+
     log(
         'Resolving streams for "${track.title}" '
-        '(plugin: ${parts.pluginId}, id: ${parts.localId})',
+        '(plugin: $effectivePluginId, id: ${parts.localId})',
         name: 'MediaResolverService');
 
     PluginResponse response;
     try {
       response = await _pluginService.execute(
-        pluginId: parts.pluginId,
+        pluginId: effectivePluginId,
         request: PluginRequest.contentResolver(
           ContentResolverCommand.getStreams(id: parts.localId),
         ),
@@ -107,12 +118,13 @@ class MediaResolverService {
     } on PluginException catch (e) {
       if (e is PluginNotLoadedException) {
         GlobalEventBus.instance.emitError(
-          AppError.pluginNotLoaded(pluginId: parts.pluginId, mediaId: track.id),
+          AppError.pluginNotLoaded(
+              pluginId: effectivePluginId, mediaId: track.id),
         );
       } else {
         GlobalEventBus.instance.emitError(
           AppError.pluginError(
-            pluginId: parts.pluginId,
+            pluginId: effectivePluginId,
             message: e.message,
           ),
         );

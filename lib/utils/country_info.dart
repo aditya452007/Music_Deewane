@@ -102,13 +102,20 @@ class CountryInfoService {
   }
 
   // Policy resolver for plugin allowlist checks.
-  // Uses selected cached country only and never performs network lookup.
+  // Fresh install has no cached country yet — returning '' previously caused
+  // every allow-listed plugin to be silently skipped (radio dead on first
+  // run). Fall back to device locale then defaultCountryCode (IN) so bootstrap
+  // never blocks on geo.
   static Future<String> resolveCountryCodeForPolicyCheck({
     required SettingsDAO settingsDao,
     bool forceRefresh = false,
   }) async {
     final cached = await readCachedCountryCode(settingsDao);
-    return cached ?? '';
+    if (cached != null && cached.isNotEmpty) return cached;
+    // ponytail: device locale is instant (no network) — try it before default.
+    final device = await resolveCountryCodeFromDeviceLocale();
+    if (device != null && device.isNotEmpty) return device;
+    return defaultCountryCode;
   }
 
   static Future<String?> _fetchCountryCode() async {

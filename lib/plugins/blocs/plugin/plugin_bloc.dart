@@ -149,6 +149,16 @@ class PluginBloc extends Bloc<PluginEvent, PluginState> {
       ));
 
       _preferredAutoLoadIds = await _loadStateService.readAutoLoadPluginIds();
+      // ponytail: fresh install after a partial bootstrap may have files on
+      // disk but an empty auto-load DB (errors.isEmpty was false). Seed from
+      // available so radio works even without DB — smallest diff that fixes
+      // "plugins not loading" on first install.
+      if (_preferredAutoLoadIds.isEmpty && available.isNotEmpty) {
+        _preferredAutoLoadIds = available.map((p) => p.manifest.id).toSet();
+        unawaited(_persistAutoLoadSafe(_preferredAutoLoadIds));
+        log('Auto-load DB empty but ${available.length} plugin(s) on disk — seeding auto-load with all available',
+            name: 'PluginBloc');
+      }
       final availableById = <String, PluginInfo>{
         for (final plugin in available) plugin.manifest.id: plugin,
       };
