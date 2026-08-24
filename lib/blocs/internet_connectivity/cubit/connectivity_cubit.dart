@@ -7,6 +7,7 @@ part 'connectivity_state.dart';
 class ConnectivityCubit extends Cubit<ConnectivityState> {
   StreamSubscription<List<ConnectivityResult>>? _subscription;
   ConnectivityCubit() : super(ConnectivityState.disconnected) {
+    _init();
     _subscription = Connectivity().onConnectivityChanged.listen((event) {
       if (event.contains(ConnectivityResult.wifi) ||
           event.contains(ConnectivityResult.mobile) ||
@@ -21,6 +22,24 @@ class ConnectivityCubit extends Cubit<ConnectivityState> {
       }
     });
   }
+
+  Future<void> _init() async {
+    try {
+      final result = await Connectivity().checkConnectivity();
+      if (result.contains(ConnectivityResult.wifi) ||
+          result.contains(ConnectivityResult.mobile) ||
+          result.contains(ConnectivityResult.ethernet) ||
+          result.contains(ConnectivityResult.bluetooth) ||
+          result.contains(ConnectivityResult.vpn)) {
+        emit(ConnectivityState.connected);
+        log('Initial connectivity: $result', name: 'ConnectivityCubit');
+      }
+    } catch (e, st) {
+      log('checkConnectivity failed: $e',
+          name: 'ConnectivityCubit', stackTrace: st);
+    }
+  }
+
   @override
   Future<void> close() {
     _subscription?.cancel();

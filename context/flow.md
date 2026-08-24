@@ -127,11 +127,12 @@ graph TD
 - Watch: `HistoryDAO.watchHistory()` → auto-refresh recommendations on new plays
 - `refresh()` method recomputes scores on demand
 
-### Flow: Ads — Google Mobile Ads Native Advanced (ADR-050)
-- `main()` → `MobileAds.instance.initialize()` (Android/iOS only) → `AdsConfig.isSupported` (defaultTargetPlatform check) → `AdsConfig.nativeAdUnitId` (test in debug, prod `ca-app-pub-4220631457594135/9953714892` in release)
-- `NativeAdCard` (Stateful): `initState` → `NativeAd(adUnitId, NativeAdListener, AdRequest, NativeTemplateStyle(medium, #27272A))..load()` → `AdWidget` on `onAdLoaded`; `onAdFailedToLoad` → dispose + `_didFail=true` → `SizedBox.shrink`; `BlocBuilder<ConnectivityCubit>` hides when disconnected; outer container Void Monochrome (#18181B bg, #27272A template) with "Ad" badge (policy distinguishable).
+### Flow: Ads — Google Mobile Ads Native Advanced (ADR-050 + ADR-052 fix)
+- `main()` → `MobileAds.instance.initialize()` (Android/iOS only, requires `ACCESS_NETWORK_STATE`) → `AdsConfig.isSupported` (defaultTargetPlatform check) → `AdsConfig.nativeAdUnitId` (test in debug, prod `ca-app-pub-4220631457594135/9953714892` in release)
+- `ConnectivityCubit` (ADR-052): constructor → `_init()` `await checkConnectivity()` immediate emit `connected` if wifi/mobile/ethernet/vpn → then `onConnectivityChanged` stream updates; fixes first-install always-disconnected.
+- `NativeAdCard` (Stateful, ADR-052): `initState` → `_loadAd()` → `NativeAd(...Listener...)..load()` → `AdWidget` on `onAdLoaded` (cancels retry Timer, `dev.log`); `onAdFailedToLoad` → dispose + `dev.log code/domain/message` + retry Timer 10s → 20s up to 2 retries (3 attempts) else `_didFail=true` → `SizedBox.shrink`; `BlocBuilder<ConnectivityCubit>` hides when disconnected; placeholder spinner during retry (not shrink); `dispose()` cancels Timer + disposes `Ad`. Same for `NativeAdSmallCard._loadSmallAd()`.
 - **Policy**: never in player/mini-player/UpNext/sidebar/nav, never on empty/offline/loading, 60s+ interval (no auto-refresh, dispose on nav), badge required, test IDs in debug.
-- Placements: Explore (after TopPicks + every 3 sections), Search (after tracks ≥6), Library (bottom ≥3 playlists), PlaylistView (header ≥5 tracks). Each `NativeAd` is independent (own State, own `Ad` instance, own `load()`).
+- Placements: Explore (after TopPicks + every 3 sections), Search (after tracks ≥6), Library (bottom ≥3 playlists), PlaylistView (header ≥5 tracks). Each `NativeAd` is independent (own State, own Timer, own `Ad` instance, own `load()`).
 
 ### Flow: Manage Preferences (ADR-030)
 - Settings → Manage Preferences → `ManagePreferencesScreen`
@@ -240,13 +241,15 @@ DownloaderCubit → RustDownloadService.initialize(pluginManager, stateDir, temp
   → events → _handleDownloadEvent → DownloadDAO.putDownload → _DOWNLOADS playlist
 ```
 
-### Ads
+### Ads (ADR-052)
 ```
-main() → MobileAds.instance.initialize() (platform-gated)
-  NativeAdCard.initState → NativeAd(..NativeTemplateStyle..)..load() → AdWidget (onAdLoaded)
+main() → MobileAds.instance.initialize() (platform-gated, needs ACCESS_NETWORK_STATE)
+  ConnectivityCubit._init() → checkConnectivity() → emit connected (fixes first-install)
+  NativeAdCard.initState → _loadAd() → NativeAd(..NativeTemplateStyle..)..load() → AdWidget (onAdLoaded)
     → Google AdMob server (adUnit 9953714892 / test 2247696110)
-  BlocBuilder<ConnectivityCubit> → hidden when disconnected
-  onAdFailedToLoad → dispose → shrink (no retry)
+  BlocBuilder<ConnectivityCubit> → hidden when disconnected, placeholder during retry
+  onAdFailedToLoad → dispose + dev.log code/domain/message → Timer retry 10s/20s (max 2) → else shrink
+  dispose() → cancel Timer + dispose Ad
 ```
 
 ---
@@ -335,8 +338,8 @@ graph TD
 2. `MusicDeewanePlayerCubit` is global (`main.dart`), wraps `MusicDeewanePlayer`; exposes `progressStreams` (Rx.combineLatest4) and queue/mediaItem streams; UI subscribes via streams, mutates via direct player calls.
 3. Persistence: cubit setters → repositories → DAOs → Isar; DB watchers drive reactive lists (history, library, downloads).
 4. Rust events (plugin lifecycle, download tasks) flow in via broadcast buses → blocs → UI.
-5. **Network state (ADR-028)**: `ConnectivityCubit` (root-provided) drives `OfflineBanner` overlay in `GlobalFooter`. Banner slides in/out via `AnimatedContainer`. Reconnection triggers auto-dismiss snackbar via `BlocConsumer` listener.
-6. **Ads state (ADR-050)**: `NativeAdCard` is self-contained `StatefulWidget` — owns `NativeAd`, `isLoaded`/`didFail` flags, `dispose()` frees `Ad`. No global cubit; each card independent. `BlocBuilder<ConnectivityCubit>` hides instantly when offline (no request). `AdsConfig.isSupported` (kIsWeb + defaultTargetPlatform) gates all ad creation — Web/Desktop render `SizedBox.shrink` with zero cost.
+5. **Network state (ADR-028 + ADR-052)**: `ConnectivityCubit` (root-provided) drives `OfflineBanner` overlay in `GlobalFooter` + ads gating. Constructor now calls `checkConnectivity()` immediate emit (ADR-052 fixes first-install disconnected). Banner slides in/out via `AnimatedContainer`. Reconnection triggers auto-dismiss snackbar via `BlocConsumer` listener. Requires `ACCESS_NETWORK_STATE` (ADR-052).
+6. **Ads state (ADR-050 + ADR-052)**: `NativeAdCard` is self-contained `StatefulWidget` — owns `NativeAd`, `isLoaded`/`didFail`/`_retryCount`/`_retryTimer`, `dispose()` cancels Timer + frees `Ad`. No global cubit; each card independent. `BlocBuilder<ConnectivityCubit>` hides instantly when offline (placeholder during retry). `onAdFailedToLoad` logs code/domain/message via `dev.log` + `debugPrint`, retries 10s/20s (max 2) before permanent shrink. `AdsConfig.isSupported` (kIsWeb + defaultTargetPlatform) gates all ad creation — Web/Desktop render `SizedBox.shrink` with zero cost.
 
 ---
 

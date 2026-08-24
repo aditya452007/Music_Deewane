@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:developer' as dev;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -26,6 +29,9 @@ class _NativeAdCardState extends State<NativeAdCard> {
   NativeAd? _nativeAd;
   bool _isLoaded = false;
   bool _didFail = false;
+  int _retryCount = 0;
+  Timer? _retryTimer;
+  static const _maxRetries = 2; // 3 total attempts
 
   @override
   void initState() {
@@ -37,18 +43,41 @@ class _NativeAdCardState extends State<NativeAdCard> {
 
   void _loadAd() {
     if (!_isSupported) return;
+    _nativeAd?.dispose();
     // Native template — no custom factoryId needed (uses GMA default templates).
     _nativeAd = NativeAd(
       adUnitId: AdsConfig.nativeAdUnitId,
       listener: NativeAdListener(
         onAdLoaded: (ad) {
+          _retryTimer?.cancel();
+          dev.log(
+              'NativeAd loaded: ${AdsConfig.nativeAdUnitId} retry=$_retryCount',
+              name: 'Ads');
           if (mounted) setState(() => _isLoaded = true);
         },
         onAdFailedToLoad: (ad, error) {
-          // dispose failed ad, hide widget
+          // dispose failed ad
           ad.dispose();
-          if (mounted) setState(() => _didFail = true);
-          debugPrint('NativeAd failed: $error');
+          dev.log(
+              'NativeAd failed: code=${error.code} domain=${error.domain} message=${error.message} retry=$_retryCount/$adSpecs',
+              name: 'Ads');
+          debugPrint(
+              'NativeAd failed: code=${error.code} domain=${error.domain} message=${error.message} retry=$_retryCount');
+          // retry with backoff 10s, 20s — ponytail: limited retries, not infinite storm
+          if (_retryCount < _maxRetries && mounted) {
+            _retryCount++;
+            final delay = Duration(seconds: _retryCount == 1 ? 10 : 20);
+            _retryTimer?.cancel();
+            _retryTimer = Timer(delay, () {
+              if (mounted && !_isLoaded) {
+                dev.log('NativeAd retry $_retryCount/$_maxRetries after $delay',
+                    name: 'Ads');
+                _loadAd();
+              }
+            });
+          } else {
+            if (mounted) setState(() => _didFail = true);
+          }
         },
         onAdClicked: (ad) {},
         onAdImpression: (ad) {},
@@ -84,8 +113,12 @@ class _NativeAdCardState extends State<NativeAdCard> {
     )..load();
   }
 
+  // helper for log string — keeps ad unit visible in error without leaking PII
+  String get adSpecs => AdsConfig.nativeAdUnitId;
+
   @override
   void dispose() {
+    _retryTimer?.cancel();
     _nativeAd?.dispose();
     super.dispose();
   }
@@ -201,21 +234,40 @@ class _NativeAdSmallCardState extends State<NativeAdSmallCard> {
   NativeAd? _nativeAd;
   bool _isLoaded = false;
   bool _didFail = false;
+  int _retryCount = 0;
+  Timer? _retryTimer;
+  static const _maxRetries = 2;
 
   bool get _isSupported => AdsConfig.isSupported;
 
-  @override
-  void initState() {
-    super.initState();
+  void _loadSmallAd() {
     if (!_isSupported) return;
+    _nativeAd?.dispose();
     _nativeAd = NativeAd(
       adUnitId: AdsConfig.nativeAdUnitId,
       listener: NativeAdListener(
-        onAdLoaded: (ad) => mounted ? setState(() => _isLoaded = true) : null,
+        onAdLoaded: (ad) {
+          _retryTimer?.cancel();
+          dev.log('NativeAdSmall loaded retry=$_retryCount', name: 'Ads');
+          if (mounted) setState(() => _isLoaded = true);
+        },
         onAdFailedToLoad: (ad, error) {
           ad.dispose();
-          if (mounted) setState(() => _didFail = true);
-          debugPrint('NativeAdSmall failed: $error');
+          dev.log(
+              'NativeAdSmall failed: code=${error.code} domain=${error.domain} message=${error.message} retry=$_retryCount',
+              name: 'Ads');
+          debugPrint(
+              'NativeAdSmall failed: code=${error.code} msg=${error.message} retry=$_retryCount');
+          if (_retryCount < _maxRetries && mounted) {
+            _retryCount++;
+            final delay = Duration(seconds: _retryCount == 1 ? 10 : 20);
+            _retryTimer?.cancel();
+            _retryTimer = Timer(delay, () {
+              if (mounted && !_isLoaded) _loadSmallAd();
+            });
+          } else {
+            if (mounted) setState(() => _didFail = true);
+          }
         },
       ),
       request: const AdRequest(),
@@ -244,7 +296,14 @@ class _NativeAdSmallCardState extends State<NativeAdSmallCard> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _loadSmallAd();
+  }
+
+  @override
   void dispose() {
+    _retryTimer?.cancel();
     _nativeAd?.dispose();
     super.dispose();
   }
