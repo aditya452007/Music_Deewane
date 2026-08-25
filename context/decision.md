@@ -35,6 +35,7 @@
 
 | ID | Date | Decision | Status | Affects |
 | ADR-053 | 2026-08-24 | Fix radio / plugin bootstrap cold-start: partial-success unblocks, country fallback IN, PluginBloc seed from disk, legacy bloomfactory→musicdeewanefactory remap | Accepted | lib/services/plugin_bootstrap_service.dart, lib/utils/country_info.dart, lib/plugins/blocs/plugin/plugin_bloc.dart, lib/services/player/media_resolver_service.dart |
+| ADR-054 | 2026-08-25 | README sync to website images: mirror ghpage branch used images (1-12.png + icons + hero.webp) to main assets/website, replace Bloom banners with website screenshots | Accepted | README.md, assets/website/*, ghpage branch images/ |
 | ADR-052 | 2026-08-24 | Fix ads first-install no-fill: ACCESS_NETWORK_STATE + ConnectivityCubit initial check + NativeAd retry (2× backoff 10s/20s) + structured logging | Accepted | android/app/src/main/AndroidManifest.xml, lib/blocs/internet_connectivity/cubit/connectivity_cubit.dart, lib/services/ads/native_ad_card.dart |
 | ADR-051 | 2026-08-22 | Platform-aware direct downloads: website auto-fetch latest assets (zip/apk/tar.gz) + app Update Now uses platform asset URL (zip for Windows) | Accepted | Music_Deewane/index.html, music_deewane_updater_tools.dart, global_events_cubit.dart, global_event_listener.dart, check_update_view.dart |
 | ADR-050 | 2026-08-22 | Google Mobile Ads Native Advanced — always-on, Void Monochrome themed, 4 placements, policy compliant | Accepted | pubspec.yaml, AndroidManifest.xml, Info.plist, main.dart, lib/services/ads/ads_config.dart (new), lib/services/ads/native_ad_card.dart (new), explore_screen.dart, search_screen.dart, library_screen.dart, playlist_screen.dart, app-ads.txt (new), Music_Deewane/privacy.html |
@@ -125,6 +126,17 @@
 
 <!-- Newest decisions go at the top of this section. -->
 
+
+### ADR-054: README sync to website images (ghpage -> main)
+- **Date**: 2026-08-25
+- **Status**: Accepted
+- **Context**: README referenced Bloom-named banners (`bloomeetunes_new_banner.png`, `banner2BloomeScrnShot.png`) and old `assets/docs` screenshots while live GitHub Pages site (ghpage branch) uses `images/1-12.png` etc. and Svelte `ghpage/` uses `im.webp`. GitHub README renders from `main`, so website images were invisible on main. User asked to keep only website-used images and make them available on main.
+- **Options**: Keep old assets/docs (rejected - Bloom naming, stale); copy entire ghpage images including unused Spotify leftovers (rejected - 9 unused); copy only used images (chosen).
+- **Decision**: Copied 12 PNGs (1-12.png), 4 SVGs (13-16.svg) + 5 icon SVGs + hero.webp (68KB from ghpage/static/assets/im.webp) from ghpage branch to `assets/website/` on main. Updated README: top banner now `assets/logo.png` (120px) + `hero.webp` hero, screenshots grid mirrors website order (1 hero, 2-3 features, 4/5 Library+NowPlaying, 6-9 four-card features, 10-12 highlights). Excluded 9 unused Spotify artefacts. Old assets/docs kept but dereferenced. Verified all README src paths exist and bloom/assets/docs refs removed.
+- **Why**: Single source: README shows what visitors see on https://aditya452007.github.io/Music_Deewane/ , images resolve on GitHub because they live on main.
+- **Consequences**: README stays in sync if assets/website updated when ghpage changes; no build step.
+
+---
 ### ADR-053: Fix radio / plugin bootstrap cold-start — partial-success unblocks, country fallback, PluginBloc seed, legacy ID remap
 - **Date**: 2026-08-24
 - **Status**: Accepted

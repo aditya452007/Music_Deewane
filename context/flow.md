@@ -48,6 +48,12 @@ graph TD
 
 ---
 
+
+### Flow: Website images -> README (ADR-054)
+- ghpage branch (origin/ghpage, deployed to https://aditya452007.github.io/Music_Deewane/) renders index.html with 22 used assets: images/1-12.png, images/13-16.svg, icon SVGs, assets/logo.png.
+- Svelte ghpage/ folder on main uses ghpage/static/assets/im.webp (hero) - mirrored.
+- main now mirrors these at assets/website/ (via git show origin/ghpage:images/* + hero). README references assets/website/screenshots/* and hero.webp + assets/logo.png so screenshots render on GitHub. 9 unused Spotify artefacts excluded.
+
 ## User Flows (verified from code)
 
 ### Flow: App launch → gates → Home

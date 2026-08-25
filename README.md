@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./assets/docs/bloomeetunes_new_banner.png" alt="Music Deewane Banner" width="100%">
+<img src="./assets/logo.png" alt="Music Deewane Logo" width="120">
 
 # 🎵 Music Deewane
 
@@ -17,14 +17,37 @@
 </div>
 
 <div align="center">
-  <p float="left">
-    <img src="./assets/docs/playlistview.png" width="48%" />
-    <img src="./assets/docs/artistview.png" width="48%" />
+  <img src="./assets/website/hero.webp" alt="Music Deewane - Character listening to music" width="320" />
+</div>
+
+## 📸 Screenshots
+
+> Screenshots from the official website (same images as [GitHub Pages](https://aditya452007.github.io/Music_Deewane/)) — now mirrored on `main` at `assets/website/` so the README renders directly on GitHub.
+
+<div align="center">
+  <p>
+    <img src="./assets/website/screenshots/1.png" width="92%" alt="Music Deewane Demo - Hero" />
+  </p>
+  <p>
+    <img src="./assets/website/screenshots/2.png" width="92%" alt="Music Deewane - Features" />
+  </p>
+  <p>
+    <img src="./assets/website/screenshots/3.png" width="92%" alt="Music Deewane - Library overview" />
   </p>
   <p float="left">
-    <img src="./assets/docs/playerview.png" width="48%" />
-    <img src="./assets/docs/lyricsview1.png" width="48%" />
-<img src="./assets/docs/banner2BloomeScrnShot.png" width="90%"/>
+    <img src="./assets/website/screenshots/4.png" width="48%" alt="Your Library" />
+    <img src="./assets/website/screenshots/5.png" width="48%" alt="Now Playing" />
+  </p>
+  <p float="left">
+    <img src="./assets/website/screenshots/6.png" width="24%" alt="Smart Playlists" />
+    <img src="./assets/website/screenshots/7.png" width="24%" alt="Synced Lyrics" />
+    <img src="./assets/website/screenshots/8.png" width="24%" alt="Offline Downloads" />
+    <img src="./assets/website/screenshots/9.png" width="24%" alt="Plugin System" />
+  </p>
+  <p float="left">
+    <img src="./assets/website/screenshots/10.png" width="32%" alt="100% Free" />
+    <img src="./assets/website/screenshots/11.png" width="32%" alt="No Ads" />
+    <img src="./assets/website/screenshots/12.png" width="32%" alt="Open Source" />
   </p>
 </div>
 
